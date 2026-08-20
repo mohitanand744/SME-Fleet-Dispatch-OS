@@ -14,21 +14,21 @@ export function AdminOverview() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-100 text-blue-800 border border-blue-200">
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-500/20 text-blue-300 border border-blue-500/30">
               Admin Portal
             </span>
             <span className="text-xs text-slate-400 font-medium">Updated 2m ago</span>
           </div>
-          <h1 className="text-3xl font-extrabold text-main-dark mt-2 tracking-tight">Executive Dashboard</h1>
-          <p className="text-slate-500 text-sm mt-1">
+          <h1 className="text-3xl font-extrabold text-white mt-2 tracking-tight">Executive Dashboard</h1>
+          <p className="text-slate-400 text-sm mt-1">
             Global fleet health, driver metrics, and revenue analytics.
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" className="bg-white border-slate-200 text-main-dark hover:bg-slate-50 shadow-sm font-medium">
+          <Button variant="outline" className="bg-white/5 border-white/10 text-white/80 hover:bg-white/10 hover:text-white shadow-sm font-medium">
             <Download className="w-4 h-4 mr-2" /> Export Audit
           </Button>
-          <Button className="bg-main-dark hover:bg-main-dark/90 text-white shadow-md font-semibold">
+          <Button className="bg-white/10 hover:bg-white/20 text-white border border-white/15 shadow-sm font-semibold">
             <Plus className="w-4 h-4 mr-2" /> Add Vehicle
           </Button>
         </div>
@@ -40,21 +40,21 @@ export function AdminOverview() {
           title="Total Fleet"
           value="148"
           icon={Truck}
-          accentColor="text-blue-700"
+          accentColor="text-blue-400"
           trend={{ value: "+6 new", isPositive: true, label: "this month" }}
         />
         <MetricCard
           title="Active Drivers"
           value="112"
           icon={Users}
-          accentColor="text-indigo-700"
+          accentColor="text-indigo-400"
           trend={{ value: "98% on duty", isPositive: true }}
         />
         <MetricCard
           title="Monthly Gross"
           value="$284.5k"
           icon={DollarSign}
-          accentColor="text-emerald-700"
+          accentColor="text-emerald-400"
           trend={{ value: "+14.2%", isPositive: true, label: "vs last mo" }}
         />
         <MetricCard
@@ -68,13 +68,13 @@ export function AdminOverview() {
 
       {/* Operations & Revenue Charts */}
       <div className="grid gap-6 lg:grid-cols-7">
-        <Card className="border-none shadow-md bg-white lg:col-span-4">
-          <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-slate-100">
+        <Card className="border border-white/10 shadow-xl bg-[#0B1020] text-white rounded-2xl lg:col-span-4">
+          <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-white/10">
             <div>
-              <CardTitle className="text-lg font-bold text-main-dark">Monthly Fleet Utilization</CardTitle>
+              <CardTitle className="text-lg font-bold text-white">Monthly Fleet Utilization</CardTitle>
               <p className="text-xs text-slate-400 mt-0.5">Fleet runtime and delivery completion rates</p>
             </div>
-            <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+            <span className="text-xs font-bold text-emerald-400 bg-emerald-500/20 px-2.5 py-1 rounded-full border border-emerald-500/30">
               92.4% Peak Efficiency
             </span>
           </CardHeader>
@@ -82,12 +82,12 @@ export function AdminOverview() {
             <div className="flex items-end justify-between h-56 gap-2 sm:gap-4 px-2">
               {[45, 62, 78, 85, 70, 92, 88, 76, 95, 82, 89, 94].map((val, idx) => (
                 <div key={idx} className="flex-1 flex flex-col items-center gap-2 group">
-                  <div className="w-full bg-slate-100 rounded-t-lg h-44 flex items-end overflow-hidden p-0.5">
+                  <div className="w-full bg-[#0E1528] rounded-t-lg h-44 flex items-end overflow-hidden p-0.5">
                     <motion.div
                       initial={{ height: 0 }}
                       animate={{ height: `${val}%` }}
                       transition={{ duration: 0.8, delay: idx * 0.05 }}
-                      className="w-full bg-gradient-to-t from-main-dark to-slate-600 rounded-t group-hover:from-blue-600 group-hover:to-blue-400 transition-colors"
+                      className="w-full bg-gradient-to-t from-blue-600 to-cyan-400 rounded-t group-hover:from-blue-500 group-hover:to-cyan-300 transition-colors"
                     />
                   </div>
                   <span className="text-[11px] font-semibold text-slate-400">
@@ -100,10 +100,10 @@ export function AdminOverview() {
         </Card>
 
         {/* Live Admin Operations Roster */}
-        <Card className="border-none shadow-md bg-white lg:col-span-3 flex flex-col">
-          <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-slate-100">
-            <CardTitle className="text-lg font-bold text-main-dark">Priority Vehicle Status</CardTitle>
-            <ShieldCheck className="w-5 h-5 text-emerald-600" />
+        <Card className="border border-white/10 shadow-xl bg-[#0B1020] text-white rounded-2xl lg:col-span-3 flex flex-col">
+          <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-white/10">
+            <CardTitle className="text-lg font-bold text-white">Priority Vehicle Status</CardTitle>
+            <ShieldCheck className="w-5 h-5 text-emerald-400" />
           </CardHeader>
           <CardContent className="pt-4 flex-1 space-y-3">
             {[
@@ -114,18 +114,16 @@ export function AdminOverview() {
             ].map((v, i) => (
               <div
                 key={i}
-                className="flex items-center justify-between p-3 rounded-xl border border-slate-100 hover:border-slate-200 hover:bg-slate-50/70 transition-all"
+                className="flex items-center justify-between p-3 rounded-xl bg-[#0E1528] border border-white/5 hover:border-white/15 hover:bg-white/5 transition-all"
               >
                 <div>
                   <div className="flex items-center gap-2">
-                    <p className="font-bold text-sm text-main-dark">{v.plate}</p>
-                    <StatusBadge status={v.status} />
+                    <span className="font-bold text-sm text-white">{v.plate}</span>
+                    <span className="text-xs text-slate-400">({v.type})</span>
                   </div>
-                  <p className="text-xs text-slate-500 mt-1">{v.type} • {v.driver}</p>
+                  <p className="text-xs text-slate-400 mt-0.5">Driver: <span className="text-slate-300 font-medium">{v.driver}</span> • {v.mileage}</p>
                 </div>
-                <div className="text-right">
-                  <span className="text-xs font-semibold text-slate-600">{v.mileage}</span>
-                </div>
+                <StatusBadge status={v.status as any} />
               </div>
             ))}
           </CardContent>

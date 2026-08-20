@@ -16,8 +16,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html lang="en" className="dark" style={{ colorScheme: "dark" }}>
+      <body className={`${inter.className} bg-[#0E1528] text-slate-100 min-h-screen antialiased selection:bg-blue-600 selection:text-white`}>
         <QueryProvider>
           {children}
         </QueryProvider>

@@ -68,11 +68,11 @@ export function LoginForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-main-dark font-semibold text-sm">Email</FormLabel>
+                  <FormLabel className="text-slate-300 font-semibold text-sm">Email</FormLabel>
                   <FormControl>
                     <Input 
                       placeholder="Enter Your Email" 
-                      className="h-12 bg-white/50 border-white/60 focus-visible:bg-white focus-visible:ring-main-dark focus-visible:border-main-dark rounded-xl transition-all shadow-sm px-4" 
+                      className="h-12 bg-[#0E1528] border-white/10 text-white placeholder:text-slate-500 focus-visible:bg-[#131B34] focus-visible:ring-blue-500 rounded-xl transition-all shadow-inner px-4" 
                       {...field} 
                     />
                   </FormControl>
@@ -88,19 +88,19 @@ export function LoginForm() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-main-dark font-semibold text-sm">Password</FormLabel>
+                  <FormLabel className="text-slate-300 font-semibold text-sm">Password</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Input 
                         type={showPassword ? "text" : "password"} 
                         placeholder="Enter Your Password" 
-                        className="h-12 bg-white/50 border-white/60 focus-visible:bg-white focus-visible:ring-main-dark focus-visible:border-main-dark rounded-xl transition-all shadow-sm px-4 pr-12" 
+                        className="h-12 bg-[#0E1528] border-white/10 text-white placeholder:text-slate-500 focus-visible:bg-[#131B34] focus-visible:ring-blue-500 rounded-xl transition-all shadow-inner px-4 pr-12" 
                         {...field} 
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-main-dark transition-colors"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
                       >
                         {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                       </button>
@@ -115,7 +115,7 @@ export function LoginForm() {
           <motion.div variants={item} className="pt-2">
             <Button 
               type="submit" 
-              className="w-full h-12 bg-main-dark hover:bg-main-dark/90 text-main-white rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 group font-semibold text-base"
+              className="w-full h-12 bg-white/10 hover:bg-white/20 text-white border border-white/15 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 group font-semibold text-base"
             >
               <LogIn className="w-5 h-5 mr-2" />
               Sign In

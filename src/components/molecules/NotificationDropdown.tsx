@@ -194,8 +194,8 @@ export function NotificationDropdown() {
           size="icon"
           onClick={() => setIsOpen(!isOpen)}
           className={cn(
-            "text-slate-500 hover:text-main-dark hover:bg-main-light/20 relative rounded-full w-10 h-10 transition-colors",
-            isOpen && "bg-main-light/20 text-main-dark ring-2 ring-main-dark/10"
+            "text-slate-300 hover:text-white hover:bg-white/10 relative rounded-xl w-10 h-10 transition-all border border-transparent hover:border-white/15",
+            isOpen && "bg-white/15 text-white border-white/20 ring-2 ring-white/10"
           )}
           aria-label="Notifications"
         >
@@ -205,7 +205,7 @@ export function NotificationDropdown() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 400, damping: 20 }}
-              className="absolute top-1.5 right-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-extrabold text-white shadow-sm ring-2 ring-white"
+              className="absolute top-1.5 right-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-extrabold text-white shadow-sm ring-2 ring-[#131B34]"
             >
               {unreadCount}
             </motion.span>
@@ -221,15 +221,15 @@ export function NotificationDropdown() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.96 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="fixed inset-x-3 top-20 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-2.5 w-auto sm:w-96 max-w-[calc(100vw-24px)] rounded-2xl bg-white shadow-2xl border border-main-light/50 z-50 overflow-hidden flex flex-col backdrop-blur-xl"
+            className="fixed inset-x-3 top-20 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-2.5 w-auto sm:w-96 max-w-[calc(100vw-24px)] rounded-2xl bg-[#0B1020] shadow-2xl border border-white/10 z-50 overflow-hidden flex flex-col backdrop-blur-2xl text-slate-100"
             style={{ maxHeight: "calc(100vh - 100px)" }}
           >
             {/* Header */}
-            <div className="p-4 border-b border-main-light/40 bg-gradient-to-b from-main-white/60 to-white flex items-center justify-between">
+            <div className="p-4 border-b border-white/10 bg-[#080D1A] flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <h3 className="font-extrabold text-main-dark text-base tracking-tight">Notifications</h3>
+                <h3 className="font-extrabold text-white text-base tracking-tight">Notifications</h3>
                 {unreadCount > 0 && (
-                  <span className="bg-rose-100 text-rose-700 text-xs font-bold px-2 py-0.5 rounded-full">
+                  <span className="bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-bold px-2 py-0.5 rounded-full">
                     {unreadCount} unread
                   </span>
                 )}
@@ -238,16 +238,16 @@ export function NotificationDropdown() {
                 {unreadCount > 0 && (
                   <button
                     onClick={markAllAsRead}
-                    className="text-xs font-bold text-main-dark hover:text-blue-600 flex items-center gap-1 px-2 py-1 rounded-md hover:bg-main-light/30 transition-colors"
+                    className="text-xs font-bold text-blue-400 hover:text-blue-300 flex items-center gap-1 px-2 py-1 rounded-md hover:bg-white/5 transition-colors"
                     title="Mark all as read"
                   >
-                    <CheckCheck className="w-3.5 h-3.5 text-emerald-600" />
+                    <CheckCheck className="w-3.5 h-3.5 text-emerald-400" />
                     <span className="hidden sm:inline">Mark read</span>
                   </button>
                 )}
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="p-1 rounded-md text-slate-400 hover:text-main-dark hover:bg-main-light/30 transition-colors"
+                  className="p-1 rounded-md text-slate-400 hover:text-white hover:bg-white/5 transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -255,14 +255,14 @@ export function NotificationDropdown() {
             </div>
 
             {/* Filter Pill Tabs */}
-            <div className="flex items-center gap-1.5 px-4 pt-2.5 pb-2 border-b border-main-light/30 text-xs bg-white">
+            <div className="flex items-center gap-1.5 px-4 pt-2.5 pb-2 border-b border-white/10 text-xs bg-[#0B1020]">
               <button
                 onClick={() => setFilter("all")}
                 className={cn(
-                  "px-3 py-1 rounded-lg font-bold transition-all",
+                  "px-3 py-1 rounded-lg font-bold transition-all border",
                   filter === "all"
-                    ? "bg-main-dark text-white shadow-sm"
-                    : "text-slate-500 hover:bg-main-light/20 hover:text-main-dark"
+                    ? "bg-white/15 text-white border-white/20 shadow-sm"
+                    : "bg-transparent text-slate-400 border-transparent hover:bg-white/5 hover:text-slate-200"
                 )}
               >
                 All ({notifications.length})
@@ -270,10 +270,10 @@ export function NotificationDropdown() {
               <button
                 onClick={() => setFilter("unread")}
                 className={cn(
-                  "px-3 py-1 rounded-lg font-bold transition-all",
+                  "px-3 py-1 rounded-lg font-bold transition-all border",
                   filter === "unread"
-                    ? "bg-main-dark text-white shadow-sm"
-                    : "text-slate-500 hover:bg-main-light/20 hover:text-main-dark"
+                    ? "bg-white/15 text-white border-white/20 shadow-sm"
+                    : "bg-transparent text-slate-400 border-transparent hover:bg-white/5 hover:text-slate-200"
                 )}
               >
                 Unread ({unreadCount})
@@ -281,7 +281,7 @@ export function NotificationDropdown() {
             </div>
 
             {/* Scrollable List of Notifications */}
-            <div className="overflow-y-auto max-h-[380px] divide-y divide-main-light/20 custom-scrollbar bg-slate-50/20">
+            <div className="overflow-y-auto max-h-[380px] divide-y divide-white/5 custom-scrollbar bg-transparent">
               <AnimatePresence mode="popLayout">
                 {filteredNotifications.length === 0 ? (
                   <motion.div
@@ -292,7 +292,7 @@ export function NotificationDropdown() {
                     exit={{ opacity: 0 }}
                     className="p-8 text-center text-slate-400 text-sm"
                   >
-                    <Bell className="w-8 h-8 mx-auto mb-2 text-slate-300 stroke-1" />
+                    <Bell className="w-8 h-8 mx-auto mb-2 text-slate-500 stroke-1" />
                     No {filter === "unread" ? "unread" : ""} notifications
                   </motion.div>
                 ) : (
@@ -318,11 +318,11 @@ export function NotificationDropdown() {
                           }
                         }}
                         exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.12 } }}
-                        whileHover={{ backgroundColor: "rgba(241, 245, 249, 0.6)" }}
+                        whileHover={{ backgroundColor: "rgba(255, 255, 255, 0.04)" }}
                         onClick={() => markAsRead(notif.id)}
                         className={cn(
                           "p-3.5 flex items-start gap-3 cursor-pointer transition-colors relative group",
-                          notif.unread && "bg-blue-50/40"
+                          notif.unread && "bg-blue-600/10"
                         )}
                       >
                         {/* Icon */}
@@ -341,7 +341,7 @@ export function NotificationDropdown() {
                             <p
                               className={cn(
                                 "text-xs font-bold truncate",
-                                notif.unread ? "text-main-dark font-extrabold" : "text-slate-700"
+                                notif.unread ? "text-white font-extrabold" : "text-slate-300"
                               )}
                             >
                               {notif.title}
@@ -350,14 +350,14 @@ export function NotificationDropdown() {
                               {notif.time}
                             </span>
                           </div>
-                          <p className="text-xs text-slate-500 leading-snug line-clamp-2">
+                          <p className="text-xs text-slate-400 leading-snug line-clamp-2">
                             {notif.description}
                           </p>
                         </div>
 
                         {/* Unread blue indicator dot */}
                         {notif.unread && (
-                          <div className="w-2 h-2 rounded-full bg-blue-600 shrink-0 self-center shadow-[0_0_8px_rgba(37,99,235,0.6)]" />
+                          <div className="w-2 h-2 rounded-full bg-blue-500 shrink-0 self-center shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
                         )}
                       </motion.div>
                     );
@@ -367,14 +367,14 @@ export function NotificationDropdown() {
             </div>
 
             {/* Bottom Footer with "View all" Button */}
-            <div className="p-3 border-t border-slate-100 bg-slate-50/70">
+            <div className="p-3 border-t border-white/10 bg-[#080D1A]">
               <button
                 type="button"
                 onClick={() => {
                   setIsOpen(false);
                   setIsSidePanelOpen(true);
                 }}
-                className="w-full h-10 flex items-center justify-center gap-2 rounded-xl bg-main-dark hover:bg-main-dark/90 text-white font-bold text-xs shadow-sm hover:shadow transition-all group cursor-pointer"
+                className="w-full h-10 flex items-center justify-center gap-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs border border-white/15 shadow-sm transition-all group cursor-pointer"
               >
                 <span>View all notifications</span>
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />

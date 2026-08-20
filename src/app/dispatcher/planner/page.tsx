@@ -9,12 +9,12 @@ export default function DispatcherPlannerPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-main-dark tracking-tight">Route Planner & Optimization</h1>
-          <p className="text-slate-500 text-sm mt-1">
+          <h1 className="text-3xl font-extrabold text-white tracking-tight">Route Planner & Optimization</h1>
+          <p className="text-slate-400 text-sm mt-1">
             Compute optimal multi-stop corridors, toll avoidance, and live ETA calculations.
           </p>
         </div>
-        <Button className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold">
+        <Button className="bg-white/10 hover:bg-white/20 text-white border border-white/15 shadow-sm font-semibold">
           <Zap className="w-4 h-4 mr-2" /> Optimize Multi-Stop Corridor
         </Button>
       </div>
@@ -36,14 +36,14 @@ export default function DispatcherPlannerPage() {
             efficiency: "94%",
           },
         ].map((plan, idx) => (
-          <Card key={idx} className="border-none shadow-md bg-white">
-            <CardHeader className="border-b border-slate-100 pb-3">
+          <Card key={idx} className="border border-white/10 shadow-xl bg-[#0B1020] text-white rounded-2xl">
+            <CardHeader className="border-b border-white/10 pb-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Route className="w-5 h-5 text-emerald-600" />
-                  <CardTitle className="text-base font-bold text-main-dark">{plan.corridor}</CardTitle>
+                  <Route className="w-5 h-5 text-emerald-400" />
+                  <CardTitle className="text-base font-bold text-white">{plan.corridor}</CardTitle>
                 </div>
-                <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+                <span className="text-xs font-bold text-emerald-300 bg-emerald-500/20 px-2.5 py-1 rounded-full border border-emerald-500/30">
                   {plan.efficiency} Score
                 </span>
               </div>
@@ -51,8 +51,8 @@ export default function DispatcherPlannerPage() {
             <CardContent className="pt-4 space-y-4">
               <div className="space-y-2 text-xs">
                 {plan.stops.map((stop, sIdx) => (
-                  <div key={sIdx} className="flex items-center gap-2 text-slate-700 font-medium">
-                    <span className="w-5 h-5 rounded-full bg-slate-100 text-slate-600 font-bold flex items-center justify-center text-[10px] shrink-0">
+                  <div key={sIdx} className="flex items-center gap-2 text-slate-300 font-medium">
+                    <span className="w-5 h-5 rounded-full bg-[#0E1528] text-blue-400 font-bold flex items-center justify-center text-[10px] shrink-0 border border-white/10">
                       {sIdx + 1}
                     </span>
                     <span>{stop}</span>
@@ -60,9 +60,9 @@ export default function DispatcherPlannerPage() {
                 ))}
               </div>
 
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-slate-500">
-                <span>Distance: {plan.distance}</span>
-                <span>Est Time: {plan.estTime}</span>
+              <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs font-bold text-slate-400">
+                <span>Distance: <span className="text-slate-200">{plan.distance}</span></span>
+                <span>Est Time: <span className="text-slate-200">{plan.estTime}</span></span>
               </div>
             </CardContent>
           </Card>

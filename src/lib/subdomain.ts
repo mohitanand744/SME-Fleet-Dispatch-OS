@@ -37,7 +37,8 @@ export function getRoleFromSubdomain(subdomain: string | null): UserRole | null 
   if (!subdomain) return null;
   const clean = subdomain.toLowerCase().trim();
 
-  if (clean === "admin") return "admin";
+  if (clean === "carrier" || clean === "carrier-admin" || clean === "admin") return "carrier-admin";
+  if (clean === "dispatch-admin" || clean === "agency") return "dispatch-admin";
   if (clean === "dispatcher" || clean === "dispatch") return "dispatcher";
 
   return null;

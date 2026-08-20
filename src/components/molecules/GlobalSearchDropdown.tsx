@@ -39,58 +39,98 @@ const searchableDatabase: SearchResultItem[] = [
   // Pages
   {
     id: "p-1",
-    title: "Executive Dashboard",
-    subtitle: "Global fleet overview, KPIs, and revenue analytics",
+    title: "Carrier Executive Dashboard",
+    subtitle: "Carrier fleet overview, KPIs, and revenue analytics",
     category: "Pages",
-    url: "/admin",
+    url: "/carrier-admin",
     iconType: "dashboard",
-    badge: "Admin Portal",
+    badge: "Carrier Admin",
     badgeType: "blue",
   },
   {
     id: "p-2",
-    title: "Fleet Assets & Maintenance",
-    subtitle: "Manage all trucks, vans, mileage, and servicing logs",
+    title: "Carrier Truck Fleet Management",
+    subtitle: "Register, monitor, inspect, and manage commercial vehicle assets",
     category: "Pages",
-    url: "/admin/fleet",
+    url: "/carrier-admin/trucks",
     iconType: "fleet",
-    badge: "Fleet OS",
+    badge: "Trucks CRUD",
     badgeType: "indigo",
   },
   {
     id: "p-3",
-    title: "Driver Staff & Personnel",
-    subtitle: "Rosters, CDL certifications, driver hours and ratings",
+    title: "Driver Personnel Roster",
+    subtitle: "Carrier driver certifications, duty statuses, and vehicle assignments",
     category: "Pages",
-    url: "/admin/drivers",
+    url: "/carrier-admin/users/drivers",
     iconType: "driver",
-    badge: "Personnel",
+    badge: "Drivers",
     badgeType: "indigo",
   },
   {
     id: "p-4",
-    title: "Reports & Financial Audits",
-    subtitle: "Fuel consumption, billing settlements, and compliance exports",
+    title: "Carrier Dispatcher Staff",
+    subtitle: "Dedicated fleet desk assignments and coverage corridors",
     category: "Pages",
-    url: "/admin/reports",
-    iconType: "report",
-    badge: "Billing",
+    url: "/carrier-admin/users/dispatchers",
+    iconType: "driver",
+    badge: "Dispatchers",
     badgeType: "blue",
   },
   {
     id: "p-5",
-    title: "Organization & Subdomain Settings",
-    subtitle: "Enterprise configuration and multi-tenant routing",
+    title: "Carrier Company Membership",
+    subtitle: "Enterprise fleet tier, truck quotas, and broker network contracts",
     category: "Pages",
-    url: "/admin/settings",
+    url: "/carrier-admin/membership",
     iconType: "settings",
-    badge: "Config",
-    badgeType: "slate",
+    badge: "Membership",
+    badgeType: "amber",
   },
   {
     id: "p-6",
-    title: "Live Dispatch Queue",
-    subtitle: "Real-time dispatch console, queue monitoring, and alerts",
+    title: "Carrier Admin Profile & Password",
+    subtitle: "Edit account information and reset security passwords",
+    category: "Pages",
+    url: "/carrier-admin/profile",
+    iconType: "settings",
+    badge: "Security",
+    badgeType: "slate",
+  },
+  {
+    id: "p-7",
+    title: "Dispatch Agency Executive Hub",
+    subtitle: "Partner carrier fleet management, staff assignments, and commission",
+    category: "Pages",
+    url: "/dispatch-admin",
+    iconType: "dashboard",
+    badge: "Dispatch Admin",
+    badgeType: "indigo",
+  },
+  {
+    id: "p-8",
+    title: "Dispatch Agency Carrier Trucks",
+    subtitle: "Contracted carrier trucks registry and vehicle assignment",
+    category: "Pages",
+    url: "/dispatch-admin/trucks",
+    iconType: "fleet",
+    badge: "Trucks",
+    badgeType: "indigo",
+  },
+  {
+    id: "p-9",
+    title: "Dispatch Agency Membership",
+    subtitle: "Premier dispatch license, carrier contracts, and desk quotas",
+    category: "Pages",
+    url: "/dispatch-admin/membership",
+    iconType: "settings",
+    badge: "Membership",
+    badgeType: "amber",
+  },
+  {
+    id: "p-10",
+    title: "Live Dispatch Queue Console",
+    subtitle: "Real-time dispatch queue, queue monitoring, and urgent alerts",
     category: "Pages",
     url: "/dispatcher",
     iconType: "dashboard",
@@ -98,33 +138,33 @@ const searchableDatabase: SearchResultItem[] = [
     badgeType: "emerald",
   },
   {
-    id: "p-7",
-    title: "Active Freight Loads",
-    subtitle: "Create, assign, and track live freight shipments",
+    id: "p-11",
+    title: "Available Fleet Trucks (Membership Verified)",
+    subtitle: "View and assign available trucks authorized under company membership",
     category: "Pages",
-    url: "/dispatcher/loads",
-    iconType: "load",
-    badge: "Loads",
+    url: "/dispatcher/trucks",
+    iconType: "fleet",
+    badge: "Available Trucks",
     badgeType: "emerald",
   },
   {
-    id: "p-8",
-    title: "Route Corridor Planner",
-    subtitle: "Multi-stop route optimization and live ETA calculations",
+    id: "p-12",
+    title: "Dispatcher Membership Affiliations",
+    subtitle: "Operational desk seat authorization and carrier clearances",
     category: "Pages",
-    url: "/dispatcher/planner",
-    iconType: "planner",
-    badge: "Routing",
-    badgeType: "emerald",
+    url: "/dispatcher/membership",
+    iconType: "settings",
+    badge: "Membership",
+    badgeType: "amber",
   },
   {
-    id: "p-9",
-    title: "Dispatch Audit Logs",
-    subtitle: "Immutable audit trail of driver arrivals and load milestones",
+    id: "p-13",
+    title: "Dispatcher Profile & Password",
+    subtitle: "Edit profile info and reset dispatcher desk key",
     category: "Pages",
-    url: "/dispatcher/logs",
-    iconType: "report",
-    badge: "Audit",
+    url: "/dispatcher/profile",
+    iconType: "settings",
+    badge: "Profile",
     badgeType: "slate",
   },
 
@@ -492,7 +532,7 @@ export function GlobalSearchDropdown({ role = "admin", isMobile = false }: Globa
     <div className={cn("relative", isMobile ? "w-full" : "w-56 lg:w-80")} ref={containerRef}>
       {/* Search Input Bar */}
       <div className="relative group">
-        <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-main-dark transition-colors" />
+        <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-400 transition-colors" />
         <Input
           ref={inputRef}
           value={query}
@@ -509,8 +549,8 @@ export function GlobalSearchDropdown({ role = "admin", isMobile = false }: Globa
               : isDispatcher ? "Search loads, routes, drivers..." : "Search fleet, assets, staff..."
           }
           className={cn(
-            "pl-10 pr-8 h-10 bg-main-white/50 border-main-light/50 focus-visible:ring-main-dark focus-visible:bg-white rounded-full text-xs transition-all shadow-xs",
-            isMobile && "h-11 pl-12 bg-main-light/10 text-sm"
+            "pl-10 pr-8 h-10 bg-[#0E1528] border-white/10 text-white placeholder:text-slate-400 focus-visible:ring-blue-500 focus-visible:bg-[#131B34] rounded-full text-xs transition-all shadow-inner",
+            isMobile && "h-11 pl-12 text-sm"
           )}
         />
 
@@ -522,12 +562,12 @@ export function GlobalSearchDropdown({ role = "admin", isMobile = false }: Globa
               setIsOpen(false);
               inputRef.current?.focus();
             }}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-main-dark transition-colors p-0.5"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors p-0.5"
           >
             <X className="w-3.5 h-3.5" />
           </button>
         ) : (
-          <div className="hidden lg:flex absolute right-3 top-1/2 -translate-y-1/2 items-center gap-0.5 pointer-events-none text-[10px] font-mono font-bold text-slate-400 bg-slate-100/80 px-1.5 py-0.5 rounded border border-slate-200">
+          <div className="hidden lg:flex absolute right-3 top-1/2 -translate-y-1/2 items-center gap-0.5 pointer-events-none text-[10px] font-mono font-bold text-slate-400 bg-white/5 px-1.5 py-0.5 rounded border border-white/10">
             <Command className="w-2.5 h-2.5" /> K
           </div>
         )}
@@ -542,7 +582,7 @@ export function GlobalSearchDropdown({ role = "admin", isMobile = false }: Globa
             exit={{ opacity: 0, y: 6, scale: 0.98 }}
             transition={{ duration: 0.18, ease: "easeOut" }}
             className={cn(
-              "absolute left-0 mt-2.5 w-[340px] sm:w-[420px] max-w-[calc(100vw-32px)] bg-white rounded-2xl shadow-2xl border border-main-light/50 z-50 overflow-hidden backdrop-blur-xl",
+              "absolute left-0 mt-2.5 w-[340px] sm:w-[420px] max-w-[calc(100vw-32px)] bg-[#0B1020] rounded-2xl shadow-2xl border border-white/10 z-50 overflow-hidden backdrop-blur-2xl text-slate-100",
               !isMobile && "lg:left-[-50px]"
             )}
             style={{ maxHeight: "460px" }}
@@ -551,8 +591,8 @@ export function GlobalSearchDropdown({ role = "admin", isMobile = false }: Globa
             {!query.trim() ? (
               <div className="p-4 space-y-3">
                 <div className="flex items-center justify-between text-xs text-slate-400 font-bold uppercase tracking-wider">
-                  <span className="flex items-center gap-1.5 text-main-dark">
-                    <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                  <span className="flex items-center gap-1.5 text-slate-200">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                     Popular Searches
                   </span>
                   <span className="text-[10px]">Click to view</span>
@@ -563,7 +603,7 @@ export function GlobalSearchDropdown({ role = "admin", isMobile = false }: Globa
                     <button
                       key={idx}
                       onClick={() => handleSelect(item.url)}
-                      className="px-3 py-1.5 rounded-xl bg-main-white/60 hover:bg-main-dark hover:text-white text-main-dark text-xs font-semibold border border-main-light/40 transition-all flex items-center gap-1.5 group cursor-pointer"
+                      className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/15 hover:text-white text-slate-200 text-xs font-semibold border border-white/10 transition-all flex items-center gap-1.5 group cursor-pointer"
                     >
                       <Search className="w-3 h-3 text-slate-400 group-hover:text-white" />
                       <span>{item.label}</span>
@@ -571,7 +611,7 @@ export function GlobalSearchDropdown({ role = "admin", isMobile = false }: Globa
                   ))}
                 </div>
 
-                <div className="pt-3 border-t border-main-light/30 space-y-2">
+                <div className="pt-3 border-t border-white/10 space-y-2">
                   <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                     Quick Operational Shortcuts
                   </p>
@@ -582,18 +622,18 @@ export function GlobalSearchDropdown({ role = "admin", isMobile = false }: Globa
                         <button
                           key={idx}
                           onClick={() => handleSelect(sc.url)}
-                          className="p-2.5 rounded-xl border border-main-light/40 hover:border-main-dark hover:bg-main-white/40 text-left transition-all group cursor-pointer"
+                          className="p-2.5 rounded-xl bg-white/5 border border-white/10 hover:border-white/25 hover:bg-white/10 text-left transition-all group cursor-pointer"
                         >
                           <div className="flex items-center justify-between gap-1 mb-1">
                             <div className="flex items-center gap-1.5">
-                              <div className="p-1.5 rounded-lg bg-main-white text-main-dark group-hover:bg-main-dark group-hover:text-white transition-colors">
+                              <div className="p-1.5 rounded-lg bg-white/10 text-white border border-white/15 group-hover:bg-white/20 transition-colors">
                                 <Icon className="w-3.5 h-3.5" />
                               </div>
-                              <span className="text-xs font-extrabold text-main-dark group-hover:text-blue-700">
+                              <span className="text-xs font-extrabold text-white group-hover:text-white">
                                 {sc.title}
                               </span>
                             </div>
-                            <ArrowRight className="w-3 h-3 text-slate-300 group-hover:text-main-dark group-hover:translate-x-0.5 transition-all shrink-0" />
+                            <ArrowRight className="w-3 h-3 text-slate-400 group-hover:text-white group-hover:translate-x-0.5 transition-all shrink-0" />
                           </div>
                           <div className="flex items-center justify-between text-[10px] text-slate-400 pl-6">
                             <span className="truncate">{sc.desc}</span>
@@ -607,10 +647,10 @@ export function GlobalSearchDropdown({ role = "admin", isMobile = false }: Globa
             ) : results.length === 0 ? (
               /* No Results State */
               <div className="p-8 text-center text-slate-400">
-                <Search className="w-8 h-8 mx-auto mb-2 text-slate-300 stroke-1" />
-                <p className="font-bold text-slate-700 text-sm">No matching results</p>
+                <Search className="w-8 h-8 mx-auto mb-2 text-slate-500 stroke-1" />
+                <p className="font-bold text-slate-200 text-sm">No matching results</p>
                 <p className="text-xs text-slate-400 mt-1">
-                  Couldn't find anything matching "<span className="font-semibold text-main-dark">{query}</span>"
+                  Couldn't find anything matching "<span className="font-semibold text-white">{query}</span>"
                 </p>
               </div>
             ) : (
@@ -621,7 +661,7 @@ export function GlobalSearchDropdown({ role = "admin", isMobile = false }: Globa
                     {/* Category Header */}
                     <div className="px-3 py-1 flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                       <span>{category}</span>
-                      <span className="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-500 font-mono">
+                      <span className="text-[10px] bg-white/5 px-1.5 py-0.5 rounded text-slate-300 font-mono">
                         {items.length}
                       </span>
                     </div>
@@ -651,22 +691,22 @@ export function GlobalSearchDropdown({ role = "admin", isMobile = false }: Globa
                             className={cn(
                               "p-2.5 rounded-xl transition-all cursor-pointer flex items-center justify-between gap-3 border",
                               isSelected
-                                ? "bg-main-light/35 border-main-light shadow-xs text-main-dark"
-                                : "bg-white border-transparent hover:bg-slate-50 text-slate-700"
+                                ? "bg-white/15 border-white/20 shadow-xs text-white"
+                                : "bg-transparent border-transparent hover:bg-white/5 text-slate-200"
                             )}
                           >
                             <div className="flex items-center gap-3 min-w-0">
                               <div
                                 className={cn(
-                                  "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-xs transition-colors",
-                                  isSelected ? "bg-main-dark text-white" : "bg-slate-100 text-slate-600"
+                                  "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-xs transition-colors border",
+                                  isSelected ? "bg-white/20 text-white border-white/25" : "bg-white/5 text-slate-300 border-white/10"
                                 )}
                               >
                                 <Icon className="w-4 h-4" />
                               </div>
 
                               <div className="min-w-0">
-                                <p className="text-xs font-bold text-main-dark truncate leading-tight">
+                                <p className="text-xs font-bold text-white truncate leading-tight">
                                   {highlightMatch(item.title, query)}
                                 </p>
                                 <p className="text-[11px] text-slate-400 truncate mt-0.5">
@@ -696,14 +736,14 @@ export function GlobalSearchDropdown({ role = "admin", isMobile = false }: Globa
 
             {/* Footer Prompt */}
             {results.length > 0 && (
-              <div className="px-3 py-2 border-t border-main-light/30 bg-slate-50/80 flex items-center justify-between text-[11px] text-slate-400 font-medium">
+              <div className="px-3 py-2 border-t border-white/10 bg-[#080D1A] flex items-center justify-between text-[11px] text-slate-400 font-medium">
                 <span className="flex items-center gap-1">
                   <span>Use</span>
-                  <span className="font-bold font-mono text-main-dark">↑</span>
-                  <span className="font-bold font-mono text-main-dark">↓</span>
+                  <span className="font-bold font-mono text-slate-200">↑</span>
+                  <span className="font-bold font-mono text-slate-200">↓</span>
                   <span>to navigate</span>
                 </span>
-                <span className="flex items-center gap-1 font-semibold text-main-dark">
+                <span className="flex items-center gap-1 font-semibold text-blue-400">
                   <span>Open</span>
                   <CornerDownLeft className="w-3 h-3" />
                 </span>

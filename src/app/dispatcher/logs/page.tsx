@@ -18,36 +18,36 @@ export default function DispatcherLogsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-main-dark tracking-tight">Real-Time Dispatch Logs</h1>
-          <p className="text-slate-500 text-sm mt-1">
+          <h1 className="text-3xl font-extrabold text-white tracking-tight">Real-Time Dispatch Logs</h1>
+          <p className="text-slate-400 text-sm mt-1">
             Immutable audit log of all route milestones, driver status changes, and freight events.
           </p>
         </div>
-        <Button className="bg-main-dark hover:bg-main-dark/90 text-white font-semibold">
+        <Button className="bg-white/10 hover:bg-white/20 text-white border border-white/15 shadow-sm font-semibold">
           <Download className="w-4 h-4 mr-2" /> Export Audit Log
         </Button>
       </div>
 
-      <Card className="border-none shadow-md bg-white">
-        <CardHeader className="border-b border-slate-100 pb-4">
-          <CardTitle className="text-base font-bold text-main-dark">Today's Event Stream</CardTitle>
+      <Card className="border border-white/10 shadow-xl bg-[#0B1020] text-white rounded-2xl">
+        <CardHeader className="border-b border-white/10 pb-4">
+          <CardTitle className="text-base font-bold text-white">Today's Event Stream</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-white/5">
             {dispatchLogs.map((log) => (
-              <div key={log.id} className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
+              <div key={log.id} className="p-4 flex items-center justify-between hover:bg-white/5 transition-colors">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-slate-100 text-slate-600 font-mono text-xs font-bold">
+                  <div className="p-2 rounded-xl bg-blue-500/20 text-blue-400 font-mono text-xs font-bold border border-blue-500/30">
                     <Clock className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-main-dark">{log.event}</p>
+                    <p className="text-sm font-bold text-white">{log.event}</p>
                     <p className="text-xs text-slate-400">Actor: {log.driver} • Log ID: {log.id}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-xs font-mono font-semibold text-slate-500">{log.time}</span>
-                  <StatusBadge status={log.type} />
+                  <span className="text-xs font-mono font-semibold text-slate-400">{log.time}</span>
+                  <StatusBadge status={log.type as any} />
                 </div>
               </div>
             ))}

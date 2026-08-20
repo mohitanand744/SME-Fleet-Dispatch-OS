@@ -264,18 +264,18 @@ export function NotificationSidePanel({
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 28, stiffness: 280 }}
-            className="relative rounded-l-3xl w-full max-w-lg bg-white shadow-2xl flex flex-col h-full z-10 border-l border-slate-200 overflow-hidden"
+            className="relative rounded-l-3xl w-full max-w-lg bg-[#080D1A] text-slate-100 shadow-2xl flex flex-col h-full z-10 border-l border-white/10 overflow-hidden"
           >
             {/* Header Section */}
-            <div className="p-5 border-b border-main-light/40 bg-gradient-to-b from-main-white/60 to-white">
+            <div className="p-5 border-b border-white/10 bg-[#0B1020]">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-main-dark text-main-white flex items-center justify-center shadow-md">
+                  <div className="w-10 h-10 rounded-xl bg-white/10 text-white flex items-center justify-center border border-white/15 shadow-sm">
                     <Bell className="w-5 h-5" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-extrabold text-main-dark tracking-tight">Notifications Center</h2>
-                    <p className="text-xs text-slate-500 font-medium">
+                    <h2 className="text-xl font-extrabold text-white tracking-tight">Notifications Center</h2>
+                    <p className="text-xs text-slate-400 font-medium">
                       Real-time updates, dispatch events, & system alerts
                     </p>
                   </div>
@@ -284,20 +284,20 @@ export function NotificationSidePanel({
                   variant="ghost"
                   size="icon"
                   onClick={onClose}
-                  className="rounded-full text-slate-400 hover:text-main-dark hover:bg-main-light/30"
+                  className="rounded-full text-slate-400 hover:text-white hover:bg-white/10"
                 >
                   <X className="w-5 h-5" />
                 </Button>
               </div>
 
               {/* Status Row & Mark All Read */}
-              <div className="flex items-center justify-between pt-2.5 border-t border-main-light/30">
+              <div className="flex items-center justify-between pt-2.5 border-t border-white/10">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-main-dark">
+                  <span className="text-xs font-bold text-slate-300">
                     {items.length} Total Events
                   </span>
                   {unreadCount > 0 && (
-                    <span className="px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-rose-100 text-rose-700">
+                    <span className="px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-rose-500/20 text-rose-300 border border-rose-500/30">
                       {unreadCount} unread
                     </span>
                   )}
@@ -308,9 +308,9 @@ export function NotificationSidePanel({
                       onMarkAllAsRead();
                       setItems((prev) => prev.map((n) => ({ ...n, unread: false })));
                     }}
-                    className="text-xs font-bold text-main-dark hover:text-blue-600 flex items-center gap-1.5 px-2.5 py-1 rounded-lg hover:bg-main-light/30 transition-colors"
+                    className="text-xs font-bold text-blue-400 hover:text-blue-300 flex items-center gap-1.5 px-2.5 py-1 rounded-lg hover:bg-white/5 transition-colors"
                   >
-                    <CheckCheck className="w-4 h-4 text-emerald-600" />
+                    <CheckCheck className="w-4 h-4 text-emerald-400" />
                     Mark all as read
                   </button>
                 )}
@@ -318,7 +318,7 @@ export function NotificationSidePanel({
             </div>
 
             {/* Search and Filters Toolbar */}
-            <div className="p-4 border-b border-main-light/40 space-y-3 bg-white">
+            <div className="p-4 border-b border-white/10 space-y-3 bg-[#0B1020]">
               {/* Search input */}
               <div className="relative">
                 <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -326,12 +326,12 @@ export function NotificationSidePanel({
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search by keyword, load ID, vehicle, or driver..."
-                  className="pl-10 h-10 bg-main-white/40 border-main-light/60 focus-visible:bg-white focus-visible:ring-main-dark text-xs rounded-xl"
+                  className="pl-10 h-10 bg-[#0E1528] border-white/10 text-white placeholder:text-slate-400 focus-visible:bg-[#131B34] focus-visible:ring-blue-500 text-xs rounded-xl"
                 />
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery("")}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-main-dark text-xs"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs"
                   >
                     Clear
                   </button>
@@ -344,10 +344,10 @@ export function NotificationSidePanel({
                   <button
                     onClick={() => setReadFilter("all")}
                     className={cn(
-                      "px-3 py-1.5 rounded-lg font-bold transition-all",
+                      "px-3 py-1.5 rounded-lg font-bold transition-all border",
                       readFilter === "all"
-                        ? "bg-main-dark text-white shadow-sm"
-                        : "text-slate-500 hover:bg-main-light/20 hover:text-main-dark"
+                        ? "bg-white/15 text-white border-white/20 shadow-sm"
+                        : "bg-transparent text-slate-400 border-transparent hover:bg-white/5 hover:text-white"
                     )}
                   >
                     All ({items.length})
@@ -355,10 +355,10 @@ export function NotificationSidePanel({
                   <button
                     onClick={() => setReadFilter("unread")}
                     className={cn(
-                      "px-3 py-1.5 rounded-lg font-bold transition-all",
+                      "px-3 py-1.5 rounded-lg font-bold transition-all border",
                       readFilter === "unread"
-                        ? "bg-main-dark text-white shadow-sm"
-                        : "text-slate-500 hover:bg-main-light/20 hover:text-main-dark"
+                        ? "bg-white/15 text-white border-white/20 shadow-sm"
+                        : "bg-transparent text-slate-400 border-transparent hover:bg-white/5 hover:text-white"
                     )}
                   >
                     Unread ({unreadCount})
@@ -377,10 +377,10 @@ export function NotificationSidePanel({
                     key={cat.id}
                     onClick={() => setActiveType(cat.id)}
                     className={cn(
-                      "px-3 py-1 rounded-full whitespace-nowrap font-semibold text-xs transition-all",
+                      "px-3 py-1 rounded-full whitespace-nowrap font-semibold text-xs transition-all border",
                       activeType === cat.id
-                        ? "bg-main-dark text-white font-bold shadow-sm"
-                        : "bg-main-light/30 text-main-dark hover:bg-main-light/60 border border-main-light/40"
+                        ? "bg-white/15 text-white border-white/20 font-bold shadow-sm"
+                        : "bg-white/5 text-slate-300 hover:bg-white/10 border-white/10"
                     )}
                   >
                     {cat.label}
@@ -392,7 +392,7 @@ export function NotificationSidePanel({
             {/* Scrollable Notification List with Infinite Scroll */}
             <div
               ref={scrollContainerRef}
-              className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#f8fafc] custom-scrollbar"
+              className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#0E1528] custom-scrollbar"
             >
               <AnimatePresence mode="popLayout">
                 {filteredList.length === 0 ? (
@@ -405,8 +405,8 @@ export function NotificationSidePanel({
                     transition={{ duration: 0.2 }}
                     className="py-16 text-center text-slate-400"
                   >
-                    <Bell className="w-10 h-10 mx-auto mb-3 text-slate-300 stroke-1" />
-                    <p className="font-bold text-slate-600 text-sm">No notifications found</p>
+                    <Bell className="w-10 h-10 mx-auto mb-3 text-slate-600 stroke-1" />
+                    <p className="font-bold text-slate-200 text-sm">No notifications found</p>
                     <p className="text-xs text-slate-400 mt-1">
                       {searchQuery ? "Try refining your search keyword." : "You're completely caught up."}
                     </p>
@@ -447,8 +447,8 @@ export function NotificationSidePanel({
                           );
                         }}
                         className={cn(
-                          "p-4 rounded-2xl bg-white border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer relative group",
-                          notif.unread && "border-blue-200 bg-gradient-to-r from-blue-50/40 via-white to-white"
+                          "p-4 rounded-2xl bg-[#0B1020] border border-white/10 shadow-sm hover:border-white/20 transition-all cursor-pointer relative group",
+                          notif.unread && "border-white/20 bg-[#0E1528]"
                         )}
                       >
                         <div className="flex items-start gap-3.5">
@@ -486,31 +486,31 @@ export function NotificationSidePanel({
                             <h4
                               className={cn(
                                 "text-sm font-bold mt-1",
-                                notif.unread ? "text-main-dark font-extrabold" : "text-slate-800"
+                                notif.unread ? "text-white font-extrabold" : "text-slate-200"
                               )}
                             >
                               {notif.title}
                             </h4>
 
-                            <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                            <p className="text-xs text-slate-400 mt-1 leading-relaxed">
                               {notif.description}
                             </p>
 
                             {/* Action Link if available */}
                             {notif.link && (
-                              <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between">
+                              <div className="mt-3 pt-2.5 border-t border-white/10 flex items-center justify-between">
                                 <Link
                                   href={notif.link}
                                   onClick={onClose}
-                                  className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors"
+                                  className="inline-flex items-center gap-1 text-xs font-bold text-blue-400 hover:text-blue-300 transition-colors"
                                 >
                                   <span>Go to resource</span>
                                   <ArrowUpRight className="w-3.5 h-3.5" />
                                 </Link>
 
                                 {notif.unread && (
-                                  <span className="flex items-center gap-1 text-[11px] font-semibold text-slate-400">
-                                    <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
+                                  <span className="flex items-center gap-1 text-[11px] font-semibold text-blue-400">
+                                    <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
                                     Unread
                                   </span>
                                 )}
@@ -527,8 +527,8 @@ export function NotificationSidePanel({
               {/* Bottom Sentinel for Infinite Scroll */}
               <div ref={bottomSentinelRef} className="py-4 text-center">
                 {isLoadingMore ? (
-                  <div className="flex items-center justify-center gap-2 text-xs font-semibold text-slate-500 py-2">
-                    <Loader2 className="w-4 h-4 animate-spin text-main-dark" />
+                  <div className="flex items-center justify-center gap-2 text-xs font-semibold text-slate-400 py-2">
+                    <Loader2 className="w-4 h-4 animate-spin text-blue-400" />
                     <span>Loading past activity stream...</span>
                   </div>
                 ) : !hasMore ? (

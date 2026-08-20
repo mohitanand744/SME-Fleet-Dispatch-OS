@@ -5,18 +5,19 @@ interface StatusBadgeProps {
   className?: string;
 }
 
-const statusStyles: Record<string, { bg: string; text: string; dot: string }> = {
-  active: { bg: "bg-emerald-500/10", text: "text-emerald-700", dot: "bg-emerald-500" },
-  in_transit: { bg: "bg-blue-500/10", text: "text-blue-700", dot: "bg-blue-500" },
-  assigned: { bg: "bg-indigo-500/10", text: "text-indigo-700", dot: "bg-indigo-500" },
-  pending: { bg: "bg-amber-500/10", text: "text-amber-700", dot: "bg-amber-500" },
-  idle: { bg: "bg-slate-500/10", text: "text-slate-700", dot: "bg-slate-500" },
-  maintenance: { bg: "bg-rose-500/10", text: "text-rose-700", dot: "bg-rose-500" },
-  delayed: { bg: "bg-red-500/10", text: "text-red-700", dot: "bg-red-500" },
-  available: { bg: "bg-emerald-500/10", text: "text-emerald-700", dot: "bg-emerald-500" },
-  on_duty: { bg: "bg-blue-500/10", text: "text-blue-700", dot: "bg-blue-500" },
-  resting: { bg: "bg-amber-500/10", text: "text-amber-700", dot: "bg-amber-500" },
-  offline: { bg: "bg-slate-500/10", text: "text-slate-600", dot: "bg-slate-400" },
+const statusStyles: Record<string, { bg: string; text: string; dot: string; border: string }> = {
+  active: { bg: "bg-emerald-500/20", text: "text-emerald-300", dot: "bg-emerald-400", border: "border-emerald-500/30" },
+  in_transit: { bg: "bg-blue-500/20", text: "text-blue-300", dot: "bg-blue-400", border: "border-blue-500/30" },
+  assigned: { bg: "bg-indigo-500/20", text: "text-indigo-300", dot: "bg-indigo-400", border: "border-indigo-500/30" },
+  pending: { bg: "bg-amber-500/20", text: "text-amber-300", dot: "bg-amber-400", border: "border-amber-500/30" },
+  idle: { bg: "bg-slate-500/20", text: "text-slate-300", dot: "bg-slate-400", border: "border-slate-500/30" },
+  maintenance: { bg: "bg-rose-500/20", text: "text-rose-300", dot: "bg-rose-400", border: "border-rose-500/30" },
+  delayed: { bg: "bg-red-500/20", text: "text-red-300", dot: "bg-red-400", border: "border-red-500/30" },
+  delivered: { bg: "bg-emerald-500/20", text: "text-emerald-300", dot: "bg-emerald-400", border: "border-emerald-500/30" },
+  available: { bg: "bg-emerald-500/20", text: "text-emerald-300", dot: "bg-emerald-400", border: "border-emerald-500/30" },
+  on_duty: { bg: "bg-blue-500/20", text: "text-blue-300", dot: "bg-blue-400", border: "border-blue-500/30" },
+  resting: { bg: "bg-amber-500/20", text: "text-amber-300", dot: "bg-amber-400", border: "border-amber-500/30" },
+  offline: { bg: "bg-slate-500/20", text: "text-slate-400", dot: "bg-slate-500", border: "border-slate-500/30" },
 };
 
 export function StatusBadge({ status, className }: StatusBadgeProps) {
@@ -30,9 +31,10 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold tracking-wide uppercase shadow-sm",
+        "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold tracking-wide uppercase shadow-sm border",
         style.bg,
         style.text,
+        style.border,
         className
       )}
     >

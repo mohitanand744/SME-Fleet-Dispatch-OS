@@ -24,44 +24,46 @@ export function MetricCard({
   value,
   icon: Icon,
   trend,
-  accentColor = "text-main-dark",
-  bgGradient = "bg-white",
+  accentColor = "text-white",
+  bgGradient = "bg-[#0B1020]",
   alert = false,
 }: MetricCardProps) {
   return (
     <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }}>
       <Card
         className={cn(
-          "border-none shadow-md hover:shadow-xl transition-all relative overflow-hidden h-full",
+          "border border-white/10 shadow-lg hover:shadow-2xl transition-all relative overflow-hidden h-full rounded-2xl",
           bgGradient,
-          alert && "border border-red-200 bg-gradient-to-br from-red-50/70 to-white"
+          alert && "border-rose-500/40 bg-gradient-to-br from-rose-950/40 to-[#0B1020]"
         )}
       >
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className={cn("text-xs font-bold tracking-wider uppercase", alert ? "text-red-600" : "text-slate-500")}>
+          <CardTitle className={cn("text-xs font-bold tracking-wider uppercase", alert ? "text-rose-400" : "text-slate-400")}>
             {title}
           </CardTitle>
           <div
             className={cn(
-              "p-2.5 rounded-xl shadow-sm",
-              alert ? "bg-red-100 text-red-600 animate-pulse" : "bg-slate-100/80 text-main-dark"
+              "p-2.5 rounded-xl shadow-sm border",
+              alert
+                ? "bg-rose-500/20 text-rose-300 border-rose-500/30 animate-pulse"
+                : "bg-white/5 text-blue-400 border-white/10"
             )}
           >
             <Icon className="h-5 w-5" />
           </div>
         </CardHeader>
         <CardContent>
-          <div className={cn("text-3xl lg:text-4xl font-black tracking-tight", alert ? "text-red-600" : accentColor)}>
+          <div className={cn("text-3xl lg:text-4xl font-black tracking-tight", alert ? "text-rose-400" : accentColor)}>
             {value}
           </div>
           {trend && (
             <div className="flex items-center mt-3 text-xs sm:text-sm font-medium">
               {trend.isPositive ? (
-                <TrendingUp className="w-4 h-4 text-emerald-500 mr-1.5 shrink-0" />
+                <TrendingUp className="w-4 h-4 text-emerald-400 mr-1.5 shrink-0" />
               ) : (
-                <TrendingDown className="w-4 h-4 text-rose-500 mr-1.5 shrink-0" />
+                <TrendingDown className="w-4 h-4 text-rose-400 mr-1.5 shrink-0" />
               )}
-              <span className={trend.isPositive ? "text-emerald-600 font-bold" : "text-rose-600 font-bold"}>
+              <span className={trend.isPositive ? "text-emerald-400 font-bold" : "text-rose-400 font-bold"}>
                 {trend.value}
               </span>
               {trend.label && <span className="text-slate-400 ml-1.5">{trend.label}</span>}

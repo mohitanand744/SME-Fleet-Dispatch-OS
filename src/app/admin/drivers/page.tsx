@@ -19,46 +19,63 @@ export default function AdminDriversPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-main-dark tracking-tight">Driver Personnel</h1>
-          <p className="text-slate-500 text-sm mt-1">
+          <h1 className="text-3xl font-extrabold text-white tracking-tight">Driver Personnel</h1>
+          <p className="text-slate-400 text-sm mt-1">
             Driver rosters, performance ratings, CDL certifications, and status monitoring.
           </p>
         </div>
-        <Button className="bg-main-dark hover:bg-main-dark/90 text-white font-semibold">
-          <Plus className="w-4 h-4 mr-2" /> Add Driver
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button className="bg-white/10 hover:bg-white/20 text-white border border-white/15 shadow-sm font-semibold">
+            <Plus className="w-4 h-4 mr-2" /> Add Driver
+          </Button>
+        </div>
       </div>
 
+      {/* Search & Filter Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-2xl bg-[#0B1020] border border-white/10 shadow-lg">
+        <div className="relative w-full sm:w-80">
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Input
+            placeholder="Search driver name, license, vehicle..."
+            className="pl-9 h-10 bg-[#0E1528] border-white/10 text-white placeholder:text-slate-400 text-sm rounded-xl"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-semibold text-slate-400 hidden sm:inline">Active Roster: {driverList.length} Drivers</span>
+        </div>
+      </div>
+
+      {/* Driver Personnel Cards Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {driverList.map((driver) => (
-          <Card key={driver.id} className="border-none shadow-md bg-white hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-slate-100">
+          <Card key={driver.id} className="border border-white/10 shadow-xl bg-[#0B1020] text-white hover:border-white/20 transition-all rounded-2xl overflow-hidden">
+            <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-white/10 bg-[#0B1020]">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-slate-100 text-main-dark font-extrabold flex items-center justify-center text-sm border border-slate-200">
+                <div className="w-10 h-10 rounded-xl bg-white/10 text-white font-extrabold flex items-center justify-center text-sm border border-white/15 shadow-sm">
                   {driver.name.split(" ").map((n) => n[0]).join("")}
                 </div>
                 <div>
-                  <CardTitle className="text-base font-bold text-main-dark">{driver.name}</CardTitle>
+                  <CardTitle className="text-base font-bold text-white">{driver.name}</CardTitle>
                   <p className="text-xs text-slate-400 font-medium">{driver.license}</p>
                 </div>
               </div>
-              <StatusBadge status={driver.status} />
+              <StatusBadge status={driver.status as any} />
             </CardHeader>
-            <CardContent className="pt-4 space-y-3 text-xs">
-              <div className="flex items-center justify-between text-slate-600">
-                <span className="font-semibold">Current Vehicle:</span>
-                <span className="font-bold text-main-dark">{driver.vehicle}</span>
+            <CardContent className="p-4 space-y-2.5 text-xs bg-[#0B1020]">
+              <div className="p-2.5 rounded-xl bg-[#0E1528] border border-white/5 flex items-center justify-between text-slate-300">
+                <span className="font-semibold text-slate-400">Current Vehicle:</span>
+                <span className="font-bold text-white font-mono">{driver.vehicle}</span>
               </div>
-              <div className="flex items-center justify-between text-slate-600">
-                <span className="font-semibold">Contact:</span>
-                <span className="font-mono text-slate-500">{driver.phone}</span>
+              <div className="p-2.5 rounded-xl bg-[#0E1528] border border-white/5 flex items-center justify-between text-slate-300">
+                <span className="font-semibold text-slate-400">Contact:</span>
+                <span className="font-mono text-slate-200">{driver.phone}</span>
               </div>
-              <div className="flex items-center justify-between pt-2 border-t border-slate-100">
-                <div className="flex items-center gap-1 text-amber-500 font-bold">
+              <div className="p-2.5 rounded-xl bg-[#0E1528] border border-white/5 flex items-center justify-between">
+                <div className="flex items-center gap-1 text-amber-400 font-bold">
                   <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                  <span>{driver.rating}</span>
+                  <span>{driver.rating} Rating</span>
                 </div>
-                <span className="text-slate-500 font-semibold">{driver.trips} completed trips</span>
+                <span className="text-slate-400 font-semibold">{driver.trips} trips completed</span>
               </div>
             </CardContent>
           </Card>

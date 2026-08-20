@@ -1,0 +1,370 @@
+"use client";
+
+import { useState } from "react";
+import {
+  Users,
+  Plus,
+  Search,
+  Star,
+  Phone,
+  Mail,
+  Truck,
+  Edit2,
+  Trash2,
+  Calendar,
+  ShieldCheck,
+  UserCheck,
+  Send,
+  MailPlus,
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "@/components/atoms/button";
+import { Input } from "@/components/atoms/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/atoms/card";
+import { StatusBadge } from "@/features/shared/components/StatusBadge";
+import { useDriversData } from "@/data";
+import { DriverUser } from "@/data/mock-users";
+import { UserModal } from "./UserModal";
+import { InviteUserModal } from "./InviteUserModal";
+import { ViewToggle, ViewMode } from "@/components/atoms/ViewToggle";
+import { ZoomableImage } from "@/context/ImageLightboxContext";
+import { cn } from "@/lib/utils";
+
+interface DriverListProps {
+  title?: string;
+  subtitle?: string;
+  companyId?: string;
+  companyName?: string;
+}
+
+export function DriverList({
+  title = "Drivers Management",
+  subtitle = "CDL certifications, duty statuses, assigned trucks, and safety ratings.",
+  companyId,
+  companyName,
+}: DriverListProps) {
+  const { drivers, addDriver, updateDriver, deleteDriver } = useDriversData(companyId);
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [driverToEdit, setDriverToEdit] = useState<DriverUser | null>(null);
+
+  const filteredDrivers = drivers.filter((driver) => {
+    const matchesSearch =
+      driver.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      driver.licenseNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      driver.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (driver.assignedTruckPlate && driver.assignedTruckPlate.toLowerCase().includes(searchQuery.toLowerCase()));
+
+    const matchesStatus = statusFilter === "all" ? true : driver.status === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
+
+  return (
+    <div className="space-y-6">
+      {/* Top Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-extrabold text-white tracking-tight">{title}</h1>
+          <p className="text-slate-400 text-sm mt-1">{subtitle}</p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <Button
+            onClick={() => setIsInviteModalOpen(true)}
+            variant="outline"
+            className="bg-white/5 hover:bg-white/15 text-white border-white/15 shadow-sm font-semibold text-xs"
+          >
+            <MailPlus className="w-4 h-4 mr-2 text-blue-400" /> Invite Driver Link
+          </Button>
+
+          <Button
+            onClick={() => setIsAddModalOpen(true)}
+            className="bg-white/10 hover:bg-white/20 text-white border border-white/15 shadow-sm font-semibold text-xs"
+          >
+            <Plus className="w-4 h-4 mr-2" /> Add Driver
+          </Button>
+        </div>
+      </div>
+
+      {/* Filter and View Toggle Toolbar */}
+      <div className="p-4 rounded-2xl bg-[#0B1020] border border-white/10 shadow-xl space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="relative w-full sm:w-80">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search driver name, license, vehicle..."
+              className="pl-9 h-10 bg-[#0E1528] border-white/10 text-white placeholder:text-slate-400 text-sm rounded-xl"
+            />
+          </div>
+
+          <div className="flex items-center gap-3 self-end sm:self-auto">
+            <span className="text-xs font-semibold text-slate-400 hidden sm:inline">
+              Showing {filteredDrivers.length} of {drivers.length} Drivers
+            </span>
+            <ViewToggle viewMode={viewMode} onChange={setViewMode} />
+          </div>
+        </div>
+
+        {/* Status Filter Tabs */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 custom-scrollbar text-xs">
+          {[
+            { id: "all", label: "All Drivers" },
+            { id: "on_duty", label: "On Duty" },
+            { id: "available", label: "Available" },
+            { id: "resting", label: "Resting" },
+            { id: "offline", label: "Offline" },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setStatusFilter(tab.id)}
+              className={cn(
+                "px-3 py-1.5 rounded-xl font-bold uppercase tracking-wider transition-all border shrink-0 cursor-pointer",
+                statusFilter === tab.id
+                  ? "bg-white/15 text-white border-white/20 shadow-sm"
+                  : "bg-white/5 text-slate-400 border-white/10 hover:text-white hover:bg-white/10"
+              )}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Main List Rendering */}
+      {viewMode === "grid" ? (
+        /* Driver Cards Grid with Profile Photos */
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <AnimatePresence mode="popLayout">
+            {filteredDrivers.map((driver, idx) => (
+              <motion.div
+                key={driver.id}
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.96 }}
+                transition={{ delay: idx * 0.04 }}
+              >
+                <Card className="border border-white/10 shadow-xl bg-[#0B1020] text-white hover:border-white/20 transition-all rounded-3xl overflow-hidden flex flex-col h-full">
+                  <CardHeader className="p-4 border-b border-white/10 flex flex-row items-center justify-between bg-[#080D1A]">
+                    <div className="flex items-center gap-3">
+                      {driver.avatarUrl ? (
+                        <div className="w-12 h-12 rounded-2xl overflow-hidden border border-white/20 shadow-md bg-[#0E1528] shrink-0">
+                          <ZoomableImage
+                            src={driver.avatarUrl}
+                            alt={driver.name}
+                            captionTitle={`${driver.name} (CDL: ${driver.licenseNumber})`}
+                            containerClassName="w-full h-full"
+                            className="w-full h-full object-cover"
+                            showZoomBadge={false}
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-12 h-12 rounded-2xl bg-white/10 text-white font-extrabold flex items-center justify-center text-sm border border-white/15 shadow-sm shrink-0">
+                          {driver.name.split(" ").map((n) => n[0]).join("")}
+                        </div>
+                      )}
+                      <div>
+                        <CardTitle className="text-base font-bold text-white">{driver.name}</CardTitle>
+                        <p className="text-xs text-slate-400 font-mono">{driver.licenseNumber} ({driver.licenseClass})</p>
+                      </div>
+                    </div>
+                    <StatusBadge status={driver.status as any} />
+                  </CardHeader>
+                  <CardContent className="p-4 space-y-2.5 text-xs bg-[#0B1020] flex-1 flex flex-col justify-between">
+                    <div className="space-y-2">
+                      <div className="p-2.5 rounded-xl bg-[#0E1528] border border-white/5 flex items-center justify-between text-slate-300">
+                        <span className="font-semibold text-slate-400">Assigned Vehicle:</span>
+                        <span className="font-bold text-white font-mono">{driver.assignedTruckPlate || "Unassigned"}</span>
+                      </div>
+
+                      <div className="p-2.5 rounded-xl bg-[#0E1528] border border-white/5 space-y-1 text-slate-300">
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-400">Contact:</span>
+                          <span className="font-mono text-slate-200">{driver.phone}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-400">Email:</span>
+                          <span className="text-slate-300 truncate max-w-[170px]">{driver.email}</span>
+                        </div>
+                      </div>
+
+                      <div className="p-2.5 rounded-xl bg-[#0E1528] border border-white/5 flex items-center justify-between">
+                        <div className="flex items-center gap-1 text-amber-400 font-bold">
+                          <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                          <span>{driver.rating} Rating</span>
+                        </div>
+                        <span className="text-slate-400 font-semibold">{driver.totalTrips} completed trips</span>
+                      </div>
+                    </div>
+
+                    <div className="pt-3 border-t border-white/10 flex items-center justify-between gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setDriverToEdit(driver)}
+                        className="w-[48%] h-8 text-xs font-semibold bg-white/5 border-white/10 text-slate-200 hover:bg-white/10 hover:text-white"
+                      >
+                        <Edit2 className="w-3.5 h-3.5 mr-1" /> Edit
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => deleteDriver(driver.id)}
+                        className="w-[48%] h-8 text-xs font-semibold bg-rose-500/10 border-rose-500/20 text-rose-300 hover:bg-rose-500/20"
+                      >
+                        <Trash2 className="w-3.5 h-3.5 mr-1" /> Remove
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
+      ) : (
+        /* Driver Table View with Profile Photos */
+        <Card className="border border-white/10 shadow-xl bg-[#0B1020] text-white rounded-2xl overflow-hidden">
+          <CardContent className="p-0 overflow-x-auto custom-scrollbar">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-[#080D1A] text-slate-400 uppercase text-[11px] font-bold tracking-wider border-b border-white/10">
+                <tr>
+                  <th className="px-6 py-4">Driver Profile</th>
+                  <th className="px-6 py-4">CDL License & Expiry</th>
+                  <th className="px-6 py-4">Duty Status</th>
+                  <th className="px-6 py-4">Assigned Vehicle</th>
+                  <th className="px-6 py-4">Performance Rating</th>
+                  <th className="px-6 py-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5 font-medium text-slate-300">
+                <AnimatePresence mode="popLayout">
+                  {filteredDrivers.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="px-6 py-12 text-center text-slate-400">
+                        <Users className="w-8 h-8 mx-auto mb-2 opacity-40" />
+                        <p className="font-semibold text-sm">No drivers found matching query.</p>
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredDrivers.map((driver, idx) => (
+                      <motion.tr
+                        key={driver.id}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.98 }}
+                        transition={{ delay: idx * 0.03 }}
+                        className="hover:bg-white/5 transition-colors"
+                      >
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            {driver.avatarUrl ? (
+                              <div className="w-10 h-10 rounded-xl overflow-hidden border border-white/20 shadow-sm bg-[#0E1528] shrink-0">
+                                <ZoomableImage
+                                  src={driver.avatarUrl}
+                                  alt={driver.name}
+                                  captionTitle={driver.name}
+                                  containerClassName="w-full h-full"
+                                  className="w-full h-full object-cover"
+                                  showZoomBadge={false}
+                                />
+                              </div>
+                            ) : (
+                              <div className="w-10 h-10 rounded-xl bg-white/10 text-white font-extrabold flex items-center justify-center text-xs border border-white/15 shrink-0">
+                                {driver.name.split(" ").map((n) => n[0]).join("")}
+                              </div>
+                            )}
+                            <div>
+                              <p className="font-bold text-white">{driver.name}</p>
+                              <p className="text-[11px] text-slate-400">{driver.phone}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <p className="font-mono text-white font-semibold text-xs">{driver.licenseNumber}</p>
+                          <p className="text-[11px] text-slate-400">{driver.licenseClass} • Exp: {driver.licenseExpiry}</p>
+                        </td>
+                        <td className="px-6 py-4">
+                          <StatusBadge status={driver.status as any} />
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-1.5 text-slate-200 font-mono text-xs">
+                            <Truck className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                            <span>{driver.assignedTruckPlate || "Unassigned"}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1 text-amber-400 font-bold text-xs">
+                              <Star className="w-3.5 h-3.5 fill-amber-400" />
+                              <span>{driver.rating}</span>
+                            </div>
+                            <span className="text-slate-400 text-xs">({driver.totalTrips} trips)</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <div className="flex items-center justify-end gap-1.5">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setDriverToEdit(driver)}
+                              className="h-8 px-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 text-xs font-semibold"
+                            >
+                              <Edit2 className="w-3.5 h-3.5 mr-1" /> Edit
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => deleteDriver(driver.id)}
+                              className="h-8 px-2.5 rounded-lg text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 text-xs font-semibold"
+                            >
+                              <Trash2 className="w-3.5 h-3.5 mr-1" /> Remove
+                            </Button>
+                          </div>
+                        </td>
+                      </motion.tr>
+                    ))
+                  )}
+                </AnimatePresence>
+              </tbody>
+            </table>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Direct Email Invitation Modal */}
+      <InviteUserModal
+        isOpen={isInviteModalOpen}
+        onClose={() => setIsInviteModalOpen(false)}
+        userType="driver"
+        companyName={companyName}
+        companyId={companyId}
+      />
+
+      {/* User Modal for Drivers */}
+      <UserModal
+        isOpen={isAddModalOpen || !!driverToEdit}
+        onClose={() => {
+          setIsAddModalOpen(false);
+          setDriverToEdit(null);
+        }}
+        userType="driver"
+        onSaveDriver={(driverData) => {
+          if (driverToEdit) {
+            updateDriver(driverToEdit.id, driverData);
+          } else {
+            addDriver(driverData);
+          }
+        }}
+        userToEdit={driverToEdit}
+        companyId={companyId}
+        companyName={companyName}
+      />
+    </div>
+  );
+}

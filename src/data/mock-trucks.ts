@@ -1,0 +1,166 @@
+export interface TruckItem {
+  id: string;
+  plate: string;
+  vin: string;
+  model: string;
+  type: string;
+  capacity: string;
+  status: "active" | "in_transit" | "maintenance" | "idle" | "available";
+  assignedDriverId?: string;
+  assignedDriverName?: string;
+  fuelLevel: number; // 0 - 100
+  mileage: string;
+  companyName: string;
+  companyId: string;
+  lastInspectionDate: string;
+  imageUrl: string;
+}
+
+export const TRUCK_IMAGE_PRESETS = [
+  "https://images.surferseo.art/de392d7b-7978-40fd-b3d8-05cd9eb4b91e.jpeg",
+  "https://image.cnbcfm.com/api/v1/image/107042637-gettyimages-1237635790-20090101:220110-99-651113.jpeg?v=1649249771",
+  "https://plus.unsplash.com/premium_photo-1664695368767-c42483a0bda1?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8YW1lcmljYW4lMjB0cnVja3xlbnwwfHwwfHx8MA%3D%3D",
+  "https://cdn.pixabay.com/photo/2014/09/25/11/16/truck-460432_640.jpg",
+  "https://images.unsplash.com/photo-1711942179703-fce59b6afac6?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8YW1lcmljYW4lMjB0cnVja3xlbnwwfHwwfHx8MA%3D%3D",
+  "https://images.pexels.com/photos/25526079/pexels-photo-25526079/free-photo-of-semi-trailer-truck-of-us-foods-at-the-seaside.jpeg?cs=tinysrgb&dpr=1&w=500",
+  "https://www.chevrolet.com/content/dam/chevrolet/na/us/english/index/commercial/2026-low-cab-forward-cab-over-truck-/masthead/2026-lcf-masthead-01-s.png?imwidth=1920",
+];
+
+export const INITIAL_TRUCKS: TruckItem[] = [
+  {
+    id: "TRK-101",
+    plate: "CA-992-TR",
+    vin: "1FT8W3BT3MED19201",
+    model: "Freightliner Cascadia 126",
+    type: "Heavy Semi-Truck",
+    capacity: "45,000 lbs",
+    status: "active",
+    assignedDriverId: "USR-D1",
+    assignedDriverName: "Marcus Vance",
+    fuelLevel: 88,
+    mileage: "142,500 mi",
+    companyName: "Apex Global Carrier LLC",
+    companyId: "CMP-CARRIER-01",
+    lastInspectionDate: "2026-08-01",
+    imageUrl: "https://images.surferseo.art/de392d7b-7978-40fd-b3d8-05cd9eb4b91e.jpeg",
+  },
+  {
+    id: "TRK-102",
+    plate: "CA-441-TR",
+    vin: "2FT8W3BT7MED33918",
+    model: "Peterbilt 579 UltraLoft",
+    type: "Heavy Semi-Truck",
+    capacity: "48,000 lbs",
+    status: "in_transit",
+    assignedDriverId: "USR-D2",
+    assignedDriverName: "Sarah Jenkins",
+    fuelLevel: 64,
+    mileage: "98,200 mi",
+    companyName: "Apex Global Carrier LLC",
+    companyId: "CMP-CARRIER-01",
+    lastInspectionDate: "2026-07-28",
+    imageUrl: "https://image.cnbcfm.com/api/v1/image/107042637-gettyimages-1237635790-20090101:220110-99-651113.jpeg?v=1649249771",
+  },
+  {
+    id: "TRK-103",
+    plate: "NV-883-BX",
+    vin: "3FT8W3BT9MED55012",
+    model: "Ford F-650 Super Duty",
+    type: "Box Truck 26ft",
+    capacity: "26,000 lbs",
+    status: "maintenance",
+    assignedDriverId: undefined,
+    assignedDriverName: "Unassigned",
+    fuelLevel: 35,
+    mileage: "178,000 mi",
+    companyName: "Apex Global Carrier LLC",
+    companyId: "CMP-CARRIER-01",
+    lastInspectionDate: "2026-08-10",
+    imageUrl: "https://www.chevrolet.com/content/dam/chevrolet/na/us/english/index/commercial/2026-low-cab-forward-cab-over-truck-/masthead/2026-lcf-masthead-01-s.png?imwidth=1920",
+  },
+  {
+    id: "TRK-104",
+    plate: "AZ-219-VN",
+    vin: "4FT8W3BT1MED77103",
+    model: "Mercedes Sprinter 3500 High Roof",
+    type: "Cargo Van",
+    capacity: "12,000 lbs",
+    status: "available",
+    assignedDriverId: "USR-D3",
+    assignedDriverName: "David Ross",
+    fuelLevel: 95,
+    mileage: "45,100 mi",
+    companyName: "Apex Global Carrier LLC",
+    companyId: "CMP-CARRIER-01",
+    lastInspectionDate: "2026-08-12",
+    imageUrl: "https://images.unsplash.com/photo-1711942179703-fce59b6afac6?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8YW1lcmljYW4lMjB0cnVja3xlbnwwfHwwfHx8MA%3D%3D",
+  },
+  {
+    id: "TRK-105",
+    plate: "UT-705-TR",
+    vin: "5FT8W3BT4MED99404",
+    model: "Kenworth T680 Next Gen",
+    type: "Heavy Semi-Truck",
+    capacity: "46,500 lbs",
+    status: "active",
+    assignedDriverId: "USR-D4",
+    assignedDriverName: "Elena Ramos",
+    fuelLevel: 72,
+    mileage: "88,900 mi",
+    companyName: "Apex Global Carrier LLC",
+    companyId: "CMP-CARRIER-01",
+    lastInspectionDate: "2026-08-05",
+    imageUrl: "https://plus.unsplash.com/premium_photo-1664695368767-c42483a0bda1?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8YW1lcmljYW4lMjB0cnVja3xlbnwwfHwwfHx8MA%3D%3D",
+  },
+  {
+    id: "TRK-106",
+    plate: "WA-219-TR",
+    vin: "6FT8W3BT6MED11559",
+    model: "Volvo VNL 860",
+    type: "Heavy Semi-Truck",
+    capacity: "45,000 lbs",
+    status: "in_transit",
+    assignedDriverId: "USR-D5",
+    assignedDriverName: "Kevin Durant",
+    fuelLevel: 55,
+    mileage: "114,600 mi",
+    companyName: "Vanguard Dispatch Network",
+    companyId: "CMP-DISPATCH-01",
+    lastInspectionDate: "2026-08-09",
+    imageUrl: "https://cdn.pixabay.com/photo/2014/09/25/11/16/truck-460432_640.jpg",
+  },
+  {
+    id: "TRK-107",
+    plate: "TX-904-RF",
+    vin: "7FT8W3BT8MED22419",
+    model: "Freightliner M2 106",
+    type: "Reefer Truck 24ft",
+    capacity: "24,000 lbs",
+    status: "available",
+    assignedDriverId: "USR-D6",
+    assignedDriverName: "Carlos Mendez",
+    fuelLevel: 80,
+    mileage: "62,300 mi",
+    companyName: "Vanguard Dispatch Network",
+    companyId: "CMP-DISPATCH-01",
+    lastInspectionDate: "2026-08-14",
+    imageUrl: "https://images.pexels.com/photos/25526079/pexels-photo-25526079/free-photo-of-semi-trailer-truck-of-us-foods-at-the-seaside.jpeg?cs=tinysrgb&dpr=1&w=500",
+  },
+  {
+    id: "TRK-108",
+    plate: "OR-318-FB",
+    vin: "8FT8W3BT0MED44882",
+    model: "Mack Anthem 70-inch Sleeper",
+    type: "Flatbed 48ft",
+    capacity: "48,000 lbs",
+    status: "idle",
+    assignedDriverId: undefined,
+    assignedDriverName: "Unassigned",
+    fuelLevel: 42,
+    mileage: "135,200 mi",
+    companyName: "Vanguard Dispatch Network",
+    companyId: "CMP-DISPATCH-01",
+    lastInspectionDate: "2026-07-30",
+    imageUrl: "https://images.surferseo.art/de392d7b-7978-40fd-b3d8-05cd9eb4b91e.jpeg",
+  }
+];

@@ -19,7 +19,12 @@ const config = {
     },
     extend: {
       colors: {
-        'main-dark': '#4C5E74',
+        'main-dark': '#0E1528',
+        'main-navy': '#0B1020',
+        'navy-card': '#0B1020',
+        'navy-surface': '#0E1528',
+        'navy-border': '#1E2B52',
+        'navy-hover': '#1E2A50',
         'main-light': '#D5E2EB',
         'main-white': '#E9F0F8',
         border: "hsl(var(--border))",

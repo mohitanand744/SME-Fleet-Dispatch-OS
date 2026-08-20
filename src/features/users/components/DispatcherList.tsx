@@ -22,6 +22,7 @@ import { Button } from "@/components/atoms/button";
 import { Input } from "@/components/atoms/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/atoms/card";
 import { StatusBadge } from "@/features/shared/components/StatusBadge";
+import { DataNotFound } from "@/components/molecules/DataNotFound";
 import { useDispatchersData } from "@/data";
 import { DispatcherUser } from "@/data/mock-users";
 import { UserModal } from "./UserModal";
@@ -138,15 +139,21 @@ export function DispatcherList({
       {/* Main List Rendering */}
       {viewMode === "grid" ? (
         /* Dispatcher Cards Grid with Profile Photos */
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          <AnimatePresence mode="popLayout">
-            {filteredDispatchers.map((disp, idx) => (
+        <>
+          {filteredDispatchers.length === 0 ? (
+            <div className="pt-8">
+              <DataNotFound title="No dispatchers found" description="We couldn't find any dispatchers matching your current search or filters." />
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <AnimatePresence>
+                {filteredDispatchers.map((disp, idx) => (
               <motion.div
                 key={disp.id}
-                initial={{ opacity: 0, scale: 0.96 }}
+                initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.96 }}
-                transition={{ delay: idx * 0.04 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                transition={{ duration: 0.15 }}
               >
                 <Card className="border border-white/10 shadow-xl bg-[#0B1020] text-white hover:border-white/20 transition-all rounded-3xl overflow-hidden flex flex-col h-full">
                   <CardHeader className="p-4 border-b border-white/10 flex flex-row items-center justify-between bg-[#080D1A]">
@@ -232,8 +239,10 @@ export function DispatcherList({
                 </Card>
               </motion.div>
             ))}
-          </AnimatePresence>
-        </div>
+              </AnimatePresence>
+            </div>
+          )}
+        </>
       ) : (
         /* Dispatcher Table View with Profile Photos */
         <Card className="border border-white/10 shadow-xl bg-[#0B1020] text-white rounded-2xl overflow-hidden">
@@ -250,22 +259,26 @@ export function DispatcherList({
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5 font-medium text-slate-300">
-                <AnimatePresence mode="popLayout">
+                <AnimatePresence>
                   {filteredDispatchers.length === 0 ? (
-                    <tr>
-                      <td colSpan={6} className="px-6 py-12 text-center text-slate-400">
-                        <Headphones className="w-8 h-8 mx-auto mb-2 opacity-40" />
-                        <p className="font-semibold text-sm">No dispatchers found matching query.</p>
+                    <motion.tr
+                      key="empty-dispatchers"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                    >
+                      <td colSpan={6} className="px-6 py-8">
+                        <DataNotFound title="No dispatchers found" description="We couldn't find any dispatchers matching your current search or filters." />
                       </td>
-                    </tr>
+                    </motion.tr>
                   ) : (
                     filteredDispatchers.map((disp, idx) => (
                       <motion.tr
                         key={disp.id}
-                        initial={{ opacity: 0, y: 8 }}
+                        initial={{ opacity: 0, y: 4 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.98 }}
-                        transition={{ delay: idx * 0.03 }}
+                        exit={{ opacity: 0, scale: 0.99 }}
+                        transition={{ duration: 0.15 }}
                         className="hover:bg-white/5 transition-colors"
                       >
                         <td className="px-6 py-4">

@@ -17,9 +17,15 @@ export function PortalLayout({ children, role }: PortalLayoutProps) {
 
   return (
     <ImageLightboxProvider>
-      <div className="flex h-screen w-full bg-[#0E1528] text-slate-100 overflow-hidden">
+      <div className="flex h-screen w-full bg-[#0E1528] text-slate-100 overflow-hidden relative">
+        {/* Global App Background Image */}
+        <div
+          className="absolute inset-0 z-0 opacity-[0.05] pointer-events-none bg-cover bg-center"
+          style={{ backgroundImage: `url('https://img.magnific.com/free-vector/dark-polygonal-background_79603-282.jpg?semt=ais_hybrid&w=740&q=80')` }}
+        />
+
         {/* Desktop Sidebar */}
-        <div className="hidden md:block mr-2 h-full">
+        <div className="hidden md:block mr-2 h-full relative z-10">
           <DashboardSidebar isOpen={true} role={role} />
         </div>
 
@@ -57,7 +63,7 @@ export function PortalLayout({ children, role }: PortalLayoutProps) {
         </AnimatePresence>
 
         {/* Main Content Area */}
-        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-10">
           <DashboardHeader
             role={role}
             onMenuClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}

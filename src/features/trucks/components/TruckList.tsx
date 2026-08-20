@@ -23,6 +23,7 @@ import { Button } from "@/components/atoms/button";
 import { Input } from "@/components/atoms/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/atoms/card";
 import { StatusBadge } from "@/features/shared/components/StatusBadge";
+import { DataNotFound } from "@/components/molecules/DataNotFound";
 import { TruckItem } from "@/data/mock-trucks";
 import { useTrucksData, useDriversData } from "@/data";
 import { TruckModal } from "./TruckModal";
@@ -139,15 +140,21 @@ export function TruckList({
       {/* Main List Rendering */}
       {viewMode === "grid" ? (
         /* Grid Card View with High-Res Truck Images */
-        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          <AnimatePresence mode="popLayout">
-            {filteredTrucks.map((item, idx) => (
+        <>
+          {filteredTrucks.length === 0 ? (
+            <div className="pt-8">
+              <DataNotFound title="No trucks found" description="We couldn't find any fleet assets matching your search query." />
+            </div>
+          ) : (
+            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+              <AnimatePresence>
+                {filteredTrucks.map((item, idx) => (
               <motion.div
                 key={item.id}
-                initial={{ opacity: 0, scale: 0.96 }}
+                initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.96 }}
-                transition={{ delay: idx * 0.04 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                transition={{ duration: 0.15 }}
               >
                 <Card className="border border-white/10 shadow-xl bg-[#0B1020] text-white hover:border-white/25 transition-all rounded-3xl overflow-hidden group flex flex-col h-full">
                   {/* Photo Header */}
@@ -234,8 +241,10 @@ export function TruckList({
                 </Card>
               </motion.div>
             ))}
-          </AnimatePresence>
-        </div>
+              </AnimatePresence>
+            </div>
+          )}
+        </>
       ) : (
         /* Table View */
         <Card className="border border-white/10 shadow-xl bg-[#0B1020] text-white rounded-2xl overflow-hidden">
@@ -252,22 +261,26 @@ export function TruckList({
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5 font-medium text-slate-300">
-                <AnimatePresence mode="popLayout">
+                <AnimatePresence>
                   {filteredTrucks.length === 0 ? (
-                    <tr>
-                      <td colSpan={6} className="px-6 py-12 text-center text-slate-400">
-                        <Truck className="w-8 h-8 mx-auto mb-2 opacity-40" />
-                        <p className="font-semibold text-sm">No trucks found matching query.</p>
+                    <motion.tr
+                      key="empty-trucks"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                    >
+                      <td colSpan={6} className="px-6 py-8">
+                        <DataNotFound title="No trucks found" description="We couldn't find any fleet assets matching your search query." />
                       </td>
-                    </tr>
+                    </motion.tr>
                   ) : (
                     filteredTrucks.map((item, idx) => (
                       <motion.tr
                         key={item.id}
-                        initial={{ opacity: 0, y: 8 }}
+                        initial={{ opacity: 0, y: 4 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.98 }}
-                        transition={{ delay: idx * 0.03 }}
+                        exit={{ opacity: 0, scale: 0.99 }}
+                        transition={{ duration: 0.15 }}
                         className="hover:bg-white/5 transition-colors"
                       >
                         <td className="px-6 py-4">

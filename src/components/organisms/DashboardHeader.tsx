@@ -60,13 +60,15 @@ export function DashboardHeader({
     <motion.header
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      className="bg-[#0B1020] m-2 md:mx-3 md:mt-3 rounded-2xl border border-white/10 shadow-xl z-30 relative shrink-0 flex flex-col transition-all overflow-hidden"
+      className="bg-[#0B1020] m-2 md:mx-3 md:mt-3 rounded-2xl border border-white/10 shadow-xl z-30 relative shrink-0 flex flex-col transition-all"
     >
       {/* Background Image */}
-      <div
-        className="absolute inset-0 z-0 opacity-[0.15] pointer-events-none bg-cover bg-center"
-        style={{ backgroundImage: `url('https://img.magnific.com/free-vector/dark-polygonal-background_79603-282.jpg?semt=ais_hybrid&w=740&q=80')` }}
-      />
+      <div className="absolute inset-0 z-0 overflow-hidden rounded-2xl pointer-events-none">
+        <div
+          className="absolute inset-0 opacity-[0.15] bg-cover bg-center"
+          style={{ backgroundImage: `url('https://img.magnific.com/free-vector/dark-polygonal-background_79603-282.jpg?semt=ais_hybrid&w=740&q=80')` }}
+        />
+      </div>
 
       <div className="relative z-10 w-full h-full flex flex-col">
         {/* Top Row: Navigation and Profile */}

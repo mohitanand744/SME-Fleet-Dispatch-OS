@@ -64,14 +64,14 @@ export const ADMIN_AVATAR_PRESETS = [
 ];
 
 export const DISPATCHER_AVATAR_PRESETS = [
-  "https://img.magnific.com/free-photo/colleagues-working-together-call-center-office-with-coffee_23-2149256070.jpg?semt=ais_test_b&w=740&q=80",
-  "https://media.istockphoto.com/id/2223442865/photo/sales-man-and-consulting-support-or-advice-with-headset-and-laptop.jpg?s=612x612&w=0&k=20&c=gF23PFsmsEBHVOQBRaznINj4wvC5ii4sm1S7hD4ALSs=",
-  "https://www.saskhealthauthority.ca/sites/default/files/styles/width_800px/public/2026-08/photo-wpbp-portfolio.jpg?itok=6fKQzp0V",
-  "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=500&auto=format&fit=crop&q=60",
-  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=60",
-  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&auto=format&fit=crop&q=60",
-  "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&auto=format&fit=crop&q=60",
-  "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=500&auto=format&fit=crop&q=60",
+  "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=500&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=500&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=500&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?w=500&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=500&auto=format&fit=crop&q=80",
 ];
 
 export const DRIVER_AVATAR_PRESETS = [

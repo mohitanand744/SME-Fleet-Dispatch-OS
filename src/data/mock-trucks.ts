@@ -17,22 +17,22 @@ export interface TruckItem {
 }
 
 export const TRUCK_IMAGE_PRESETS = [
-  "https://images.surferseo.art/de392d7b-7978-40fd-b3d8-05cd9eb4b91e.jpeg",
-  "https://image.cnbcfm.com/api/v1/image/107042637-gettyimages-1237635790-20090101:220110-99-651113.jpeg?v=1649249771",
-  "https://plus.unsplash.com/premium_photo-1664695368767-c42483a0bda1?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8YW1lcmljYW4lMjB0cnVja3xlbnwwfHwwfHx8MA%3D%3D",
-  "https://cdn.pixabay.com/photo/2014/09/25/11/16/truck-460432_640.jpg",
-  "https://images.unsplash.com/photo-1711942179703-fce59b6afac6?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8YW1lcmljYW4lMjB0cnVja3xlbnwwfHwwfHx8MA%3D%3D",
-  "https://images.pexels.com/photos/25526079/pexels-photo-25526079/free-photo-of-semi-trailer-truck-of-us-foods-at-the-seaside.jpeg?cs=tinysrgb&dpr=1&w=500",
-  "https://www.chevrolet.com/content/dam/chevrolet/na/us/english/index/commercial/2026-low-cab-forward-cab-over-truck-/masthead/2026-lcf-masthead-01-s.png?imwidth=1920",
-  "https://media.istockphoto.com/id/520703835/photo/truck-and-highway-at-sunset-transportation-background.jpg?s=612x612&w=0&k=20&c=LhW7JcIyqFRYqrM8Boo6Fys05-2DRgR1kJG4d25j0RI=",
-  "https://images.surferseo.art/bea67730-4fe0-444d-ac54-7e070a8cd2d9.jpeg",
-  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQf0GhSE1Uvgf7KZvnviPXt9aqRJGu_RTaGdRwJTIS4ziaGuQe6UHTDcohG&s=10",
-  "https://cdn.pixabay.com/photo/2018/03/08/21/04/transport-3209864_640.jpg",
-  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQqJC8hegdNDI6deDDw1s0JifYJL374GcPLXeCQS7tFXs8hN263OwR54IVS&s=10",
-  "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?fm=jpg&q=60&w=3000&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1519003722824-194d4455a60c?fm=jpg&q=60&w=3000&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1592838064575-70ed626d3a0e?fm=jpg&q=60&w=3000&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1559297434-fae8a1916a79?w=600&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?w=800&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1519003722824-194d4455a60c?w=800&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1586191582152-51a44e59cb3a?w=800&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1592838064575-70ed626d3a0e?w=800&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1559297434-fae8a1916a79?w=800&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1501700493788-fa1a4fc9fe62?w=800&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1616432043562-3671ea2e5242?w=800&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=800&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1508974239320-0a029497e820?w=800&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?w=800&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=800&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=800&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=800&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=800&auto=format&fit=crop&q=80",
 ];
 
 export const INITIAL_TRUCKS: TruckItem[] = [

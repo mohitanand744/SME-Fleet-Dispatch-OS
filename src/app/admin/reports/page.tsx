@@ -7,6 +7,7 @@ import { Input } from "@/components/atoms/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/atoms/card";
 import { ViewToggle, ViewMode } from "@/components/atoms/ViewToggle";
 import { ExportDataModal } from "@/components/molecules/ExportDataModal";
+import { TableScrollHint } from "@/components/atoms/TableScrollHint";
 
 const reportsData = [
   { id: "REP-01", title: "Fleet Fuel Consumption", date: "August 2026", size: "2.4 MB", runs: "148 Trucks", type: "Telemetry" },
@@ -100,38 +101,39 @@ export default function AdminReportsPage() {
       ) : (
         /* Table View */
         <Card className="border border-white/10 shadow-xl bg-[#0B1020] text-white rounded-2xl overflow-hidden">
+          <TableScrollHint />
           <CardContent className="p-0 overflow-x-auto custom-scrollbar">
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-left text-sm whitespace-nowrap min-w-[760px]">
               <thead className="bg-[#080D1A] text-slate-400 uppercase text-[11px] font-bold tracking-wider border-b border-white/10">
                 <tr>
-                  <th className="px-6 py-4">Report Name</th>
-                  <th className="px-6 py-4">Category</th>
-                  <th className="px-6 py-4">Coverage Scope</th>
-                  <th className="px-6 py-4">Period</th>
-                  <th className="px-6 py-4">File Size</th>
-                  <th className="px-6 py-4 text-right">Action</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Report Name</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Category</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Coverage Scope</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Period</th>
+                  <th className="px-6 py-4 whitespace-nowrap">File Size</th>
+                  <th className="px-6 py-4 text-right whitespace-nowrap">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5 font-medium text-slate-300">
                 {filteredReports.map((report) => (
                   <tr key={report.id} className="hover:bg-white/5 transition-colors">
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-xl bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                        <div className="p-2 rounded-xl bg-blue-500/20 text-blue-400 border border-blue-500/30 shrink-0">
                           <FileSpreadsheet className="w-4 h-4" />
                         </div>
-                        <span className="font-bold text-white">{report.title}</span>
+                        <span className="font-bold text-white truncate max-w-[220px]">{report.title}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-xs">
+                    <td className="px-6 py-4 text-xs whitespace-nowrap">
                       <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-slate-300">
                         {report.type}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-xs text-slate-300">{report.runs}</td>
-                    <td className="px-6 py-4 text-xs text-slate-400">{report.date}</td>
-                    <td className="px-6 py-4 text-xs font-mono text-slate-300">{report.size}</td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-6 py-4 text-xs text-slate-300 whitespace-nowrap">{report.runs}</td>
+                    <td className="px-6 py-4 text-xs text-slate-400 whitespace-nowrap">{report.date}</td>
+                    <td className="px-6 py-4 text-xs font-mono text-slate-300 whitespace-nowrap">{report.size}</td>
+                    <td className="px-6 py-4 text-right whitespace-nowrap">
                       <Button
                         variant="outline"
                         size="sm"

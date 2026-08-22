@@ -252,11 +252,45 @@ export function ZoomableImage({
 }: ZoomableImageProps) {
   const [hasError, setHasError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const imgRef = React.useRef<HTMLImageElement | null>(null);
   const { openLightbox } = useImageLightbox();
 
   useEffect(() => {
+    if (!src) {
+      setIsLoading(false);
+      setHasError(true);
+      return;
+    }
+
     setHasError(false);
     setIsLoading(true);
+
+    // Fast check if already cached in browser memory
+    if (imgRef.current && imgRef.current.complete) {
+      if (imgRef.current.naturalWidth > 0) {
+        setIsLoading(false);
+      } else {
+        setIsLoading(false);
+        setHasError(true);
+      }
+      return;
+    }
+
+    // Safety timeout: If external image takes longer than 2.2s, gracefully fall back to prevent stuck spinner
+    const timer = setTimeout(() => {
+      setIsLoading((loading) => {
+        if (loading) {
+          if (imgRef.current?.complete && imgRef.current.naturalWidth > 0) {
+            return false;
+          }
+          setHasError(true);
+          return false;
+        }
+        return loading;
+      });
+    }, 2200);
+
+    return () => clearTimeout(timer);
   }, [src]);
 
   // Determine fallback type automatically
@@ -292,7 +326,7 @@ export function ZoomableImage({
     switch (resolvedType) {
       case "truck":
         return (
-          <div className="w-full h-full min-h-[140px] flex flex-col items-center justify-center bg-gradient-to-br from-[#0B1020] via-[#0E1528] to-[#131B34] text-slate-400 p-4 select-none">
+          <div className="w-full h-full min-h-[120px] flex flex-col items-center justify-center bg-gradient-to-br from-[#0B1020] via-[#0E1528] to-[#131B34] text-slate-400 p-4 select-none">
             <div className="p-3 rounded-2xl bg-blue-500/15 border border-blue-500/25 text-blue-400 shadow-inner mb-2">
               <Truck className="w-8 h-8 text-blue-400" />
             </div>
@@ -355,7 +389,7 @@ export function ZoomableImage({
 
   if (!src || hasError) {
     return (
-      <div className={cn("relative overflow-hidden", containerClassName)}>
+      <div className={cn("relative w-full h-full overflow-hidden bg-[#0E1528] flex items-center justify-center", containerClassName)}>
         {renderFallback()}
       </div>
     );
@@ -371,7 +405,7 @@ export function ZoomableImage({
       data-lightbox-alt={alt}
       data-lightbox-title={captionTitle || alt}
       className={cn(
-        "zoomable-image-wrapper relative cursor-zoom-in group overflow-hidden select-none bg-[#0E1528]",
+        "zoomable-image-wrapper relative w-full h-full cursor-zoom-in group overflow-hidden select-none bg-[#0E1528] flex items-center justify-center",
         containerClassName
       )}
       title="Click to view full-screen"
@@ -384,15 +418,18 @@ export function ZoomableImage({
       )}
 
       <img
+        ref={imgRef}
         src={src}
         alt={alt}
+        loading="lazy"
+        decoding="async"
         onLoad={() => setIsLoading(false)}
         onError={() => {
           setIsLoading(false);
           setHasError(true);
         }}
         className={cn(
-          "w-full h-full object-cover transition-all duration-500 group-hover:scale-105",
+          "w-full h-full min-w-full min-h-full object-cover object-center transition-all duration-500 group-hover:scale-105 block",
           isLoading ? "opacity-0 scale-98" : "opacity-100 scale-100",
           className
         )}

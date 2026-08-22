@@ -31,6 +31,7 @@ import { InviteUserModal } from "./InviteUserModal";
 import { ConfirmationModal } from "@/components/molecules/ConfirmationModal";
 import { ViewToggle, ViewMode } from "@/components/atoms/ViewToggle";
 import { ZoomableImage } from "@/context/ImageLightboxContext";
+import { TableScrollHint } from "@/components/atoms/TableScrollHint";
 import { cn } from "@/lib/utils";
 
 import { FilterDropdown } from "@/components/molecules/FilterDropdown";
@@ -374,16 +375,17 @@ export function DriverList({
       ) : (
         /* Driver Table View with Profile Photos */
         <Card className="border border-white/10 shadow-xl bg-[#0B1020] text-white rounded-2xl overflow-hidden">
+          <TableScrollHint />
           <CardContent className="p-0 overflow-x-auto custom-scrollbar">
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-left text-sm whitespace-nowrap min-w-[800px]">
               <thead className="bg-[#080D1A] text-slate-400 uppercase text-[11px] font-bold tracking-wider border-b border-white/10">
                 <tr>
-                  <th className="px-6 py-4">Driver Profile</th>
-                  <th className="px-6 py-4">CDL License & Expiry</th>
-                  <th className="px-6 py-4">Duty Status</th>
-                  <th className="px-6 py-4">Assigned Vehicle</th>
-                  <th className="px-6 py-4">Performance Rating</th>
-                  {!readOnly && <th className="px-6 py-4 text-right">Actions</th>}
+                  <th className="px-6 py-4 whitespace-nowrap">Driver Profile</th>
+                  <th className="px-6 py-4 whitespace-nowrap">CDL License & Expiry</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Duty Status</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Assigned Vehicle</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Performance Rating</th>
+                  {!readOnly && <th className="px-6 py-4 text-right whitespace-nowrap">Actions</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5 font-medium text-slate-300">
@@ -409,7 +411,7 @@ export function DriverList({
                         transition={{ duration: 0.15 }}
                         className="hover:bg-white/5 transition-colors"
                       >
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-3">
                             {driver.avatarUrl ? (
                               <div className="w-10 h-10 rounded-xl overflow-hidden border border-white/20 shadow-sm bg-[#0E1528] shrink-0">
@@ -427,26 +429,28 @@ export function DriverList({
                                 <User className="w-5 h-5 text-slate-300" />
                               </div>
                             )}
-                            <div>
-                              <p className="font-bold text-white">{driver.name}</p>
-                              <p className="text-[11px] text-slate-400">{driver.phone}</p>
+                            <div className="min-w-0 max-w-[180px]">
+                              <p className="font-bold text-white truncate">{driver.name}</p>
+                              <p className="text-[11px] text-slate-400 truncate">{driver.phone}</p>
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4">
-                          <p className="font-mono text-white font-semibold text-xs">{driver.licenseNumber}</p>
-                          <p className="text-[11px] text-slate-400">{driver.licenseClass} • Exp: {driver.licenseExpiry}</p>
-                        </td>
-                        <td className="px-6 py-4">
-                          <StatusBadge status={driver.status as any} />
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-1.5 text-slate-200 font-mono text-xs">
-                            <Truck className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-                            <span>{driver.assignedTruckPlate || "Unassigned"}</span>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="max-w-[180px]">
+                            <p className="font-mono text-white font-semibold text-xs truncate">{driver.licenseNumber}</p>
+                            <p className="text-[11px] text-slate-400 truncate">{driver.licenseClass} • Exp: {driver.licenseExpiry}</p>
                           </div>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <StatusBadge status={driver.status as any} />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center gap-1.5 text-slate-200 font-mono text-xs max-w-[160px]">
+                            <Truck className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                            <span className="truncate">{driver.assignedTruckPlate || "Unassigned"}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-2">
                             <div className="flex items-center gap-1 text-amber-400 font-bold text-xs">
                               <Star className="w-3.5 h-3.5 fill-amber-400" />
@@ -456,7 +460,7 @@ export function DriverList({
                           </div>
                         </td>
                         {!readOnly && (
-                          <td className="px-6 py-4 text-right">
+                          <td className="px-6 py-4 text-right whitespace-nowrap">
                             <div className="flex items-center justify-end gap-1.5">
                               <Button
                                 variant="ghost"
@@ -470,7 +474,7 @@ export function DriverList({
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => setDriverToDelete(driver)}
-                                className="h-8 w-8 p-0 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg cursor-pointer"
+                                className="h-8 w-8 p-0 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-lg cursor-pointer"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                               </Button>

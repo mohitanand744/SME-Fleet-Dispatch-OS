@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Truck,
   User,
@@ -9,7 +9,6 @@ import {
   Building2,
   Image as ImageIcon,
   ZoomIn,
-  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useImageLightbox } from "@/context/ImageLightboxContext";
@@ -50,12 +49,46 @@ export function SafeImage({
 }: SafeImageProps) {
   const [hasError, setHasError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const imgRef = useRef<HTMLImageElement | null>(null);
   const { openLightbox } = useImageLightbox();
 
-  // Reset state on src change
+  // Reset and inspect cached complete status on src change
   useEffect(() => {
+    if (!src) {
+      setIsLoading(false);
+      setHasError(true);
+      return;
+    }
+
     setHasError(false);
     setIsLoading(true);
+
+    // Fast check if already cached in browser memory
+    if (imgRef.current && imgRef.current.complete) {
+      if (imgRef.current.naturalWidth > 0) {
+        setIsLoading(false);
+      } else {
+        setIsLoading(false);
+        setHasError(true);
+      }
+      return;
+    }
+
+    // Safety timeout: If external image takes longer than 2.2s, gracefully fall back to prevent stuck spinner
+    const timer = setTimeout(() => {
+      setIsLoading((loading) => {
+        if (loading) {
+          if (imgRef.current?.complete && imgRef.current.naturalWidth > 0) {
+            return false;
+          }
+          setHasError(true);
+          return false;
+        }
+        return loading;
+      });
+    }, 2200);
+
+    return () => clearTimeout(timer);
   }, [src]);
 
   // Determine fallback type automatically if not provided
@@ -102,11 +135,11 @@ export function SafeImage({
     switch (resolvedType) {
       case "truck":
         return (
-          <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#0B1020] via-[#0E1528] to-[#131B34] text-slate-400 p-4 border border-white/5 select-none">
+          <div className="w-full h-full min-h-[120px] flex flex-col items-center justify-center bg-gradient-to-br from-[#0B1020] via-[#0E1528] to-[#131B34] text-slate-400 p-4 border border-white/5 select-none">
             <div className="p-3 rounded-2xl bg-blue-500/15 border border-blue-500/25 text-blue-400 shadow-inner mb-2">
               <Truck className="w-8 h-8 text-blue-400" />
             </div>
-            <span className="text-[11px] font-bold tracking-wider uppercase text-slate-400">
+            <span className="text-[11px] font-bold tracking-wider uppercase text-slate-300">
               Fleet Commercial Vehicle
             </span>
             <span className="text-[10px] text-slate-500 truncate max-w-[85%] mt-0.5">
@@ -118,7 +151,7 @@ export function SafeImage({
       case "driver":
       case "user":
         return (
-          <div className="w-full h-full flex flex-col items-center justify-center bg-[#0E1528] text-slate-400 p-2 border border-white/5 select-none">
+          <div className="w-full h-full flex flex-col items-center justify-center bg-[#0E1528] text-slate-300 p-2 border border-white/5 select-none">
             <div className="p-2 rounded-xl bg-white/10 text-slate-300 border border-white/15">
               <User className="w-5 h-5 text-slate-300" />
             </div>
@@ -166,7 +199,7 @@ export function SafeImage({
   // If no source provided or failed to load
   if (!src || hasError) {
     return (
-      <div className={cn("relative overflow-hidden rounded-xl", containerClassName)}>
+      <div className={cn("relative w-full h-full overflow-hidden rounded-xl bg-[#0E1528] flex items-center justify-center", containerClassName)}>
         {renderFallback()}
       </div>
     );
@@ -179,7 +212,7 @@ export function SafeImage({
       data-lightbox-alt={alt}
       data-lightbox-title={captionTitle || alt}
       className={cn(
-        "relative overflow-hidden group select-none",
+        "relative w-full h-full overflow-hidden group select-none bg-[#0E1528] flex items-center justify-center",
         enableZoom ? "cursor-zoom-in" : "",
         containerClassName
       )}
@@ -194,15 +227,18 @@ export function SafeImage({
 
       {/* Actual Image */}
       <img
+        ref={imgRef}
         src={src}
         alt={alt}
+        loading="lazy"
+        decoding="async"
         onLoad={() => setIsLoading(false)}
         onError={() => {
           setIsLoading(false);
           setHasError(true);
         }}
         className={cn(
-          "w-full h-full object-cover transition-all duration-300",
+          "w-full h-full min-w-full min-h-full object-cover object-center transition-all duration-300 block",
           isLoading ? "opacity-0 scale-98" : "opacity-100 scale-100",
           enableZoom ? "group-hover:scale-105" : "",
           className

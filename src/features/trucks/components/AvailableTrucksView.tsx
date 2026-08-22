@@ -22,6 +22,7 @@ import { useTrucksData } from "@/data";
 import { TruckItem } from "@/data/mock-trucks";
 import { ViewToggle, ViewMode } from "@/components/atoms/ViewToggle";
 import { ZoomableImage } from "@/context/ImageLightboxContext";
+import { TableScrollHint } from "@/components/atoms/TableScrollHint";
 import { cn } from "@/lib/utils";
 
 import { FilterDropdown } from "@/components/molecules/FilterDropdown";
@@ -331,22 +332,23 @@ export function AvailableTrucksView() {
       ) : (
         /* Available Trucks Table View */
         <Card className="border border-white/10 shadow-xl bg-[#0B1020] text-white rounded-2xl overflow-hidden">
+          <TableScrollHint />
           <CardContent className="p-0 overflow-x-auto custom-scrollbar">
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-left text-sm whitespace-nowrap min-w-[820px]">
               <thead className="bg-[#080D1A] text-slate-400 uppercase text-[11px] font-bold tracking-wider border-b border-white/10">
                 <tr>
-                  <th className="px-6 py-4">Equipment & Plate</th>
-                  <th className="px-6 py-4">Make / Specs</th>
-                  <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4">Carrier Network</th>
-                  <th className="px-6 py-4">Driver Status</th>
-                  <th className="px-6 py-4 text-right">Action</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Equipment & Plate</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Make / Specs</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Status</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Carrier Network</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Driver Status</th>
+                  <th className="px-6 py-4 text-right whitespace-nowrap">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5 font-medium text-slate-300">
                 {availableTrucks.map((truck, idx) => (
                   <tr key={truck.id} className="hover:bg-white/5 transition-colors">
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">
                         <div className="w-14 h-11 rounded-xl overflow-hidden bg-[#080D1A] border border-white/15 shrink-0 shadow-sm relative">
                           <ZoomableImage
@@ -358,33 +360,35 @@ export function AvailableTrucksView() {
                             showZoomBadge={false}
                           />
                         </div>
-                        <div>
-                          <p className="font-bold text-white font-mono">{truck.plate}</p>
-                          <p className="text-[11px] text-slate-400 font-mono">{truck.id}</p>
+                        <div className="min-w-0 max-w-[170px]">
+                          <p className="font-bold text-white font-mono truncate">{truck.plate}</p>
+                          <p className="text-[11px] text-slate-400 font-mono truncate">{truck.id}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <p className="font-semibold text-white">{truck.model}</p>
-                      <p className="text-xs text-slate-400">{truck.type} • {truck.capacity}</p>
-                    </td>
-                    <td className="px-6 py-4">
-                      <StatusBadge status={truck.status} />
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-xs text-slate-300">{truck.companyName}</span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-1.5 text-xs text-slate-300">
-                        <UserCheck className="w-4 h-4 text-blue-400 shrink-0" />
-                        <span>{truck.assignedDriverName || "Dedicated"}</span>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="max-w-[200px]">
+                        <p className="font-semibold text-white truncate">{truck.model}</p>
+                        <p className="text-xs text-slate-400 truncate">{truck.type} • {truck.capacity}</p>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <StatusBadge status={truck.status} />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="text-xs text-slate-300 truncate max-w-[180px] block">{truck.companyName}</span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-1.5 text-xs text-slate-300 max-w-[160px]">
+                        <UserCheck className="w-4 h-4 text-blue-400 shrink-0" />
+                        <span className="truncate">{truck.assignedDriverName || "Dedicated"}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-right whitespace-nowrap">
                       <Button
                         size="sm"
                         onClick={() => setSelectedTruckForDispatch(truck)}
-                        className="h-8 px-3 text-xs font-bold bg-white/10 hover:bg-white/20 text-white border border-white/15"
+                        className="h-8 px-3 text-xs font-bold bg-white/10 hover:bg-white/20 text-white border border-white/15 cursor-pointer"
                       >
                         Assign Load
                       </Button>

@@ -30,6 +30,7 @@ import { InviteUserModal } from "./InviteUserModal";
 import { ConfirmationModal } from "@/components/molecules/ConfirmationModal";
 import { ViewToggle, ViewMode } from "@/components/atoms/ViewToggle";
 import { ZoomableImage } from "@/context/ImageLightboxContext";
+import { TableScrollHint } from "@/components/atoms/TableScrollHint";
 import { cn } from "@/lib/utils";
 
 import { FilterDropdown } from "@/components/molecules/FilterDropdown";
@@ -377,16 +378,17 @@ export function DispatcherList({
       ) : (
         /* Dispatcher Table View with Profile Photos */
         <Card className="border border-white/10 shadow-xl bg-[#0B1020] text-white rounded-2xl overflow-hidden">
+          <TableScrollHint />
           <CardContent className="p-0 overflow-x-auto custom-scrollbar">
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-left text-sm whitespace-nowrap min-w-[850px]">
               <thead className="bg-[#080D1A] text-slate-400 uppercase text-[11px] font-bold tracking-wider border-b border-white/10">
                 <tr>
-                  <th className="px-6 py-4">Dispatcher Profile</th>
-                  <th className="px-6 py-4">Desk Assignment</th>
-                  <th className="px-6 py-4">Coverage Lanes</th>
-                  <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4">Fulfillment Rating</th>
-                  <th className="px-6 py-4 text-right">Actions</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Dispatcher Profile</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Desk Assignment</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Coverage Lanes</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Status</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Fulfillment Rating</th>
+                  <th className="px-6 py-4 text-right whitespace-nowrap">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5 font-medium text-slate-300">
@@ -412,7 +414,7 @@ export function DispatcherList({
                         transition={{ duration: 0.15 }}
                         className="hover:bg-white/5 transition-colors"
                       >
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-3">
                             {disp.avatarUrl ? (
                               <div className="w-10 h-10 rounded-xl overflow-hidden border border-white/20 shadow-sm bg-[#0E1528] shrink-0">
@@ -430,32 +432,34 @@ export function DispatcherList({
                                 <User className="w-5 h-5 text-slate-300" />
                               </div>
                             )}
-                            <div>
-                              <p className="font-bold text-white">{disp.name}</p>
-                              <p className="text-[11px] text-slate-400">{disp.email}</p>
+                            <div className="min-w-0 max-w-[180px]">
+                              <p className="font-bold text-white truncate">{disp.name}</p>
+                              <p className="text-[11px] text-slate-400 truncate">{disp.email}</p>
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4">
-                          <p className="font-semibold text-white text-xs">{disp.deskAssignment}</p>
-                          <p className="text-[11px] text-slate-400">{disp.phone}</p>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="max-w-[200px]">
+                            <p className="font-semibold text-white text-xs truncate">{disp.deskAssignment}</p>
+                            <p className="text-[11px] text-slate-400 truncate">{disp.phone}</p>
+                          </div>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex flex-wrap gap-1 max-w-xs">
                             {disp.activeLanes.map((lane, lIdx) => (
                               <span
                                 key={lIdx}
-                                className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-semibold text-slate-300"
+                                className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-semibold text-slate-300 truncate max-w-[160px]"
                               >
                                 {lane}
                               </span>
                             ))}
                           </div>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <StatusBadge status={disp.status as any} />
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-2">
                             <div className="flex items-center gap-1 text-amber-400 font-bold text-xs">
                               <Star className="w-3.5 h-3.5 fill-amber-400" />
@@ -464,23 +468,23 @@ export function DispatcherList({
                             <span className="text-slate-400 text-xs">({disp.totalLoadsDispatched} loads)</span>
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-right">
+                        <td className="px-6 py-4 text-right whitespace-nowrap">
                           <div className="flex items-center justify-end gap-1.5">
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => setDispatcherToEdit(disp)}
-                              className="h-8 px-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 text-xs font-semibold cursor-pointer"
+                              className="h-8 w-8 p-0 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg cursor-pointer"
                             >
-                              <Edit2 className="w-3.5 h-3.5 mr-1" /> Edit
+                              <Edit2 className="w-3.5 h-3.5" />
                             </Button>
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => setDispatcherToDelete(disp)}
-                              className="h-8 px-2.5 rounded-lg text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 text-xs font-semibold cursor-pointer"
+                              className="h-8 w-8 p-0 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-lg cursor-pointer"
                             >
-                              <Trash2 className="w-3.5 h-3.5 mr-1" /> Remove
+                              <Trash2 className="w-3.5 h-3.5" />
                             </Button>
                           </div>
                         </td>

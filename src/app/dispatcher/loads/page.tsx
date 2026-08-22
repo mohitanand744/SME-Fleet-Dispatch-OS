@@ -8,6 +8,7 @@ import { Input } from "@/components/atoms/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/atoms/card";
 import { StatusBadge } from "@/features/shared/components/StatusBadge";
 import { ViewToggle, ViewMode } from "@/components/atoms/ViewToggle";
+import { TableScrollHint } from "@/components/atoms/TableScrollHint";
 import { CreateLoadModal } from "@/features/dispatcher/components/CreateLoadModal";
 import { ManageLoadModal } from "@/features/dispatcher/components/ManageLoadModal";
 import { DispatchLoad } from "@/features/dispatcher/types";
@@ -185,47 +186,48 @@ export default function DispatcherLoadsPage() {
       ) : (
         /* Table View */
         <Card className="border border-white/10 shadow-xl bg-[#0B1020] text-white rounded-2xl overflow-hidden">
+          <TableScrollHint />
           <CardContent className="p-0 overflow-x-auto custom-scrollbar">
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-left text-sm whitespace-nowrap min-w-[850px]">
               <thead className="bg-[#080D1A] text-slate-400 uppercase text-[11px] font-bold tracking-wider border-b border-white/10">
                 <tr>
-                  <th className="px-6 py-4">Load Order</th>
-                  <th className="px-6 py-4">Route Path</th>
-                  <th className="px-6 py-4">Weight / Payload</th>
-                  <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4">Assigned Driver</th>
-                  <th className="px-6 py-4">Freight Rate</th>
-                  <th className="px-6 py-4 text-right">Actions</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Load Order</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Route Path</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Weight / Payload</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Status</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Assigned Driver</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Freight Rate</th>
+                  <th className="px-6 py-4 text-right whitespace-nowrap">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5 font-medium text-slate-300">
                 {filteredLoads.map((load) => (
                   <tr key={load.id} className="hover:bg-white/5 transition-colors">
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                        <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shrink-0">
                           <Package className="w-4 h-4" />
                         </div>
-                        <div>
-                          <p className="font-bold text-white">{load.id}</p>
-                          <p className="text-[11px] text-slate-400">{load.commodity}</p>
+                        <div className="min-w-0 max-w-[180px]">
+                          <p className="font-bold text-white truncate">{load.id}</p>
+                          <p className="text-[11px] text-slate-400 truncate">{load.commodity}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-1.5 text-xs text-slate-300">
-                        <span>{load.origin}</span>
-                        <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
-                        <span className="font-bold text-white">{load.dest}</span>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-1.5 text-xs text-slate-300 max-w-[240px]">
+                        <span className="truncate">{load.origin}</span>
+                        <ArrowRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <span className="font-bold text-white truncate">{load.dest}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-xs font-semibold text-slate-400">{load.weight}</td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 text-xs font-semibold text-slate-400 whitespace-nowrap">{load.weight}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <StatusBadge status={load.status as any} />
                     </td>
-                    <td className="px-6 py-4 text-xs font-semibold text-slate-300">{load.driver}</td>
-                    <td className="px-6 py-4 text-xs font-bold text-emerald-400">{load.rate}</td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-6 py-4 text-xs font-semibold text-slate-300 whitespace-nowrap truncate max-w-[160px]">{load.driver}</td>
+                    <td className="px-6 py-4 text-xs font-bold text-emerald-400 whitespace-nowrap">{load.rate}</td>
+                    <td className="px-6 py-4 text-right whitespace-nowrap">
                       <Button
                         size="sm"
                         variant="ghost"

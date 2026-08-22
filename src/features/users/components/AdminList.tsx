@@ -29,6 +29,7 @@ import { InviteUserModal } from "./InviteUserModal";
 import { ConfirmationModal } from "@/components/molecules/ConfirmationModal";
 import { ViewToggle, ViewMode } from "@/components/atoms/ViewToggle";
 import { ZoomableImage } from "@/context/ImageLightboxContext";
+import { TableScrollHint } from "@/components/atoms/TableScrollHint";
 import { FilterDropdown } from "@/components/molecules/FilterDropdown";
 import { cn } from "@/lib/utils";
 
@@ -413,16 +414,17 @@ export function AdminList({
       ) : (
         /* Table View */
         <Card className="border border-white/10 shadow-xl bg-[#0B1020] text-white rounded-2xl overflow-hidden">
+          <TableScrollHint />
           <CardContent className="p-0 overflow-x-auto custom-scrollbar">
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-left text-sm whitespace-nowrap min-w-[850px]">
               <thead className="bg-[#080D1A] text-slate-400 uppercase text-[11px] font-bold tracking-wider border-b border-white/10">
                 <tr>
-                  <th className="px-6 py-4">Administrator</th>
-                  <th className="px-6 py-4">Department & Role</th>
-                  <th className="px-6 py-4">Access Scope</th>
-                  <th className="px-6 py-4">2FA Security</th>
-                  <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4 text-right">Actions</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Administrator</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Department & Role</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Access Scope</th>
+                  <th className="px-6 py-4 whitespace-nowrap">2FA Security</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Status</th>
+                  <th className="px-6 py-4 text-right whitespace-nowrap">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5 font-medium text-slate-300">
@@ -448,7 +450,7 @@ export function AdminList({
                         transition={{ duration: 0.15 }}
                         className="hover:bg-white/5 transition-colors"
                       >
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-3">
                             {admin.avatarUrl ? (
                               <div className="w-10 h-10 rounded-xl overflow-hidden border border-white/20 shadow-sm bg-[#0E1528] shrink-0">
@@ -466,22 +468,24 @@ export function AdminList({
                                 <User className="w-5 h-5 text-slate-300" />
                               </div>
                             )}
-                            <div>
-                              <p className="font-bold text-white">{admin.name}</p>
-                              <p className="text-[11px] text-slate-400">{admin.email}</p>
+                            <div className="min-w-0 max-w-[180px]">
+                              <p className="font-bold text-white truncate">{admin.name}</p>
+                              <p className="text-[11px] text-slate-400 truncate">{admin.email}</p>
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4">
-                          <p className="font-semibold text-white text-xs">{admin.department}</p>
-                          <p className="text-[11px] text-slate-400">{admin.roleTitle}</p>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="max-w-[200px]">
+                            <p className="font-semibold text-white text-xs truncate">{admin.department}</p>
+                            <p className="text-[11px] text-slate-400 truncate">{admin.roleTitle}</p>
+                          </div>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <span className="px-2 py-0.5 rounded-md bg-purple-500/20 text-purple-300 border border-purple-500/30 text-[10px] font-extrabold uppercase">
                             {admin.permissionsLevel}
                           </span>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4 whitespace-nowrap">
                           {admin.twoFactorEnabled ? (
                             <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-extrabold uppercase">
                               Enabled
@@ -492,26 +496,26 @@ export function AdminList({
                             </span>
                           )}
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <StatusBadge status={admin.status as any} />
                         </td>
-                        <td className="px-6 py-4 text-right">
+                        <td className="px-6 py-4 text-right whitespace-nowrap">
                           <div className="flex items-center justify-end gap-1.5">
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => setAdminToEdit(admin)}
-                              className="h-8 px-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 text-xs font-semibold cursor-pointer"
+                              className="h-8 w-8 p-0 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg cursor-pointer"
                             >
-                              <Edit2 className="w-3.5 h-3.5 mr-1" /> Edit
+                              <Edit2 className="w-3.5 h-3.5" />
                             </Button>
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => setAdminToDelete(admin)}
-                              className="h-8 px-2.5 rounded-lg text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 text-xs font-semibold cursor-pointer"
+                              className="h-8 w-8 p-0 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-lg cursor-pointer"
                             >
-                              <Trash2 className="w-3.5 h-3.5 mr-1" /> Remove
+                              <Trash2 className="w-3.5 h-3.5" />
                             </Button>
                           </div>
                         </td>

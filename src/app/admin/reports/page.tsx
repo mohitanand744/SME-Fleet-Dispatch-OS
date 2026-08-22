@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { FileSpreadsheet, Download, Calendar, TrendingUp, Search } from "lucide-react";
+import { FileSpreadsheet, Download, Search } from "lucide-react";
 import { Button } from "@/components/atoms/button";
 import { Input } from "@/components/atoms/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/atoms/card";
 import { ViewToggle, ViewMode } from "@/components/atoms/ViewToggle";
+import { ExportDataModal } from "@/components/molecules/ExportDataModal";
 
 const reportsData = [
   { id: "REP-01", title: "Fleet Fuel Consumption", date: "August 2026", size: "2.4 MB", runs: "148 Trucks", type: "Telemetry" },
@@ -19,6 +20,7 @@ const reportsData = [
 export default function AdminReportsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [exportReportTitle, setExportReportTitle] = useState<string | null>(null);
 
   const filteredReports = reportsData.filter(
     (rep) =>
@@ -35,7 +37,10 @@ export default function AdminReportsPage() {
             Generate operational compliance, fuel expenditure, and billing summaries.
           </p>
         </div>
-        <Button className="bg-white/10 hover:bg-white/20 text-white border border-white/15 shadow-sm font-semibold">
+        <Button
+          onClick={() => setExportReportTitle("Monthly Consolidated Fleet Report")}
+          className="bg-white/10 hover:bg-white/20 text-white border border-white/15 shadow-sm font-semibold cursor-pointer"
+        >
           <Download className="w-4 h-4 mr-2" /> Download Monthly CSV
         </Button>
       </div>
@@ -80,7 +85,12 @@ export default function AdminReportsPage() {
                     {report.type}
                   </span>
                 </div>
-                <Button variant="outline" size="sm" className="w-full mt-3 text-xs font-semibold bg-white/5 border-white/10 text-white/80 hover:bg-white/10 hover:text-white">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setExportReportTitle(report.title)}
+                  className="w-full mt-3 text-xs font-semibold bg-white/5 border-white/10 text-white/80 hover:bg-white/10 hover:text-white cursor-pointer"
+                >
                   <Download className="w-3.5 h-3.5 mr-1.5" /> Download Report
                 </Button>
               </CardContent>
@@ -122,7 +132,12 @@ export default function AdminReportsPage() {
                     <td className="px-6 py-4 text-xs text-slate-400">{report.date}</td>
                     <td className="px-6 py-4 text-xs font-mono text-slate-300">{report.size}</td>
                     <td className="px-6 py-4 text-right">
-                      <Button variant="outline" size="sm" className="h-8 text-xs font-semibold bg-white/5 border-white/10 text-white/80 hover:bg-white/10">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setExportReportTitle(report.title)}
+                        className="h-8 text-xs font-semibold bg-white/5 border-white/10 text-white/80 hover:bg-white/10 cursor-pointer"
+                      >
                         <Download className="w-3 h-3 mr-1" /> Export
                       </Button>
                     </td>
@@ -133,6 +148,14 @@ export default function AdminReportsPage() {
           </CardContent>
         </Card>
       )}
+
+      {/* Reusable Export Modal */}
+      <ExportDataModal
+        isOpen={!!exportReportTitle}
+        onClose={() => setExportReportTitle(null)}
+        title={exportReportTitle ? `Export: ${exportReportTitle}` : "Export Report"}
+        defaultFilename={exportReportTitle?.toLowerCase().replace(/\s+/g, "_") || "fleet_report"}
+      />
     </div>
   );
 }

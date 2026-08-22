@@ -4,9 +4,10 @@ export default function DispatchAdminTrucksPage() {
   return (
     <TruckList
       title="Contracted Carrier Fleet"
-      subtitle="Multi-carrier vehicle register, operational status, driver linkages, and equipment types."
+      subtitle="Multi-carrier vehicle register, operational status, driver linkages, and equipment types (View Only)."
       companyId="CMP-DISPATCH-01"
       companyName="Vanguard Dispatch Network"
+      readOnly={true}
     />
   );
 }

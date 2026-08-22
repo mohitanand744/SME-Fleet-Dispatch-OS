@@ -27,9 +27,12 @@ import { useDispatchersData } from "@/data";
 import { DispatcherUser } from "@/data/mock-users";
 import { UserModal } from "./UserModal";
 import { InviteUserModal } from "./InviteUserModal";
+import { ConfirmationModal } from "@/components/molecules/ConfirmationModal";
 import { ViewToggle, ViewMode } from "@/components/atoms/ViewToggle";
 import { ZoomableImage } from "@/context/ImageLightboxContext";
 import { cn } from "@/lib/utils";
+
+import { FilterDropdown } from "@/components/molecules/FilterDropdown";
 
 interface DispatcherListProps {
   title?: string;
@@ -48,24 +51,64 @@ export function DispatcherList({
 
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [laneFilter, setLaneFilter] = useState<string>("all");
+  const [volumeFilter, setVolumeFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("default");
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [dispatcherToEdit, setDispatcherToEdit] = useState<DispatcherUser | null>(null);
+  const [dispatcherToDelete, setDispatcherToDelete] = useState<DispatcherUser | null>(null);
 
-  const filteredDispatchers = dispatchers.filter((disp) => {
-    const matchesSearch =
-      disp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      disp.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      disp.deskAssignment.toLowerCase().includes(searchQuery.toLowerCase());
+  const activeFilterCount =
+    (laneFilter !== "all" ? 1 : 0) +
+    (volumeFilter !== "all" ? 1 : 0) +
+    (sortBy !== "default" ? 1 : 0);
 
-    const matchesStatus = statusFilter === "all" ? true : disp.status === statusFilter;
+  const handleResetFilters = () => {
+    setLaneFilter("all");
+    setVolumeFilter("all");
+    setSortBy("default");
+    setStatusFilter("all");
+  };
 
-    return matchesSearch && matchesStatus;
-  });
+  const filteredDispatchers = dispatchers
+    .filter((disp) => {
+      const matchesSearch =
+        disp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        disp.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        disp.deskAssignment.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        disp.activeLanes.some((lane: string) => lane.toLowerCase().includes(searchQuery.toLowerCase()));
+
+      const matchesStatus = statusFilter === "all" ? true : disp.status === statusFilter;
+
+      const matchesLane =
+        laneFilter === "all"
+          ? true
+          : disp.activeLanes.some((l: string) => l.toLowerCase().includes(laneFilter.toLowerCase())) ||
+            disp.deskAssignment.toLowerCase().includes(laneFilter.toLowerCase());
+
+      const matchesVolume =
+        volumeFilter === "all"
+          ? true
+          : volumeFilter === "high"
+          ? disp.totalLoadsDispatched >= 300
+          : volumeFilter === "mid"
+          ? disp.totalLoadsDispatched >= 150 && disp.totalLoadsDispatched < 300
+          : disp.totalLoadsDispatched < 150;
+
+      return matchesSearch && matchesStatus && matchesLane && matchesVolume;
+    })
+    .sort((a, b) => {
+      if (sortBy === "name-asc") return a.name.localeCompare(b.name);
+      if (sortBy === "loads-desc") return b.totalLoadsDispatched - a.totalLoadsDispatched;
+      if (sortBy === "rating-desc") return b.rating - a.rating;
+      return 0;
+    });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -93,18 +136,106 @@ export function DispatcherList({
 
       {/* Filter and View Toggle Toolbar */}
       <div className="p-4 rounded-2xl bg-[#0B1020] border border-white/10 shadow-xl space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="relative w-full sm:w-80">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <Input
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search dispatcher name, desk, email..."
-              className="pl-9 h-10 bg-[#0E1528] border-white/10 text-white placeholder:text-slate-400 text-sm rounded-xl"
-            />
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 flex-1 max-w-xl">
+            <div className="relative flex-1">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search dispatcher name, desk, email..."
+                className="pl-9 h-10 bg-[#0E1528] border-white/10 text-white placeholder:text-slate-400 text-sm rounded-xl w-full"
+              />
+            </div>
+
+            {/* Modern Filter Popover */}
+            <FilterDropdown
+              isOpen={isFilterOpen}
+              onToggle={() => setIsFilterOpen(!isFilterOpen)}
+              onClose={() => setIsFilterOpen(false)}
+              onClear={handleResetFilters}
+              activeCount={activeFilterCount}
+              title="Filter Dispatch Staff"
+            >
+              {/* Lane / Regional Coverage */}
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  Assigned Lane & Route Territory
+                </label>
+                <div className="grid grid-cols-2 gap-1.5 text-xs">
+                  {[
+                    { id: "all", label: "All Lanes" },
+                    { id: "west", label: "West Coast" },
+                    { id: "midwest", label: "Midwest" },
+                    { id: "east", label: "East Coast" },
+                    { id: "south", label: "Southern" },
+                    { id: "pacific", label: "Pacific NW" },
+                  ].map((l) => (
+                    <button
+                      key={l.id}
+                      type="button"
+                      onClick={() => setLaneFilter(l.id)}
+                      className={cn(
+                        "px-2.5 py-1.5 rounded-xl font-semibold text-left transition-all border",
+                        laneFilter === l.id
+                          ? "bg-purple-600/30 border-purple-500 text-white font-bold"
+                          : "bg-white/5 border-white/5 text-slate-400 hover:text-white hover:bg-white/10"
+                      )}
+                    >
+                      {l.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Active Load Volume */}
+              <div className="space-y-1.5 pt-2 border-t border-white/10">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  Active Dispatch Load Queue
+                </label>
+                <div className="grid grid-cols-3 gap-1.5 text-xs">
+                  {[
+                    { id: "all", label: "Any Volume" },
+                    { id: "high", label: "10+ Heavy" },
+                    { id: "mid", label: "5-9 Active" },
+                  ].map((v) => (
+                    <button
+                      key={v.id}
+                      type="button"
+                      onClick={() => setVolumeFilter(v.id)}
+                      className={cn(
+                        "px-2 py-1.5 rounded-xl font-semibold text-center transition-all border text-[11px]",
+                        volumeFilter === v.id
+                          ? "bg-purple-600/30 border-purple-500 text-white font-bold"
+                          : "bg-white/5 border-white/5 text-slate-400 hover:text-white hover:bg-white/10"
+                      )}
+                    >
+                      {v.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Sort Order */}
+              <div className="space-y-1.5 pt-2 border-t border-white/10">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  Sort Dispatchers By
+                </label>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="w-full h-9 bg-[#0E1528] border border-white/10 text-white text-xs rounded-xl px-3 focus:outline-hidden"
+                >
+                  <option value="default">Default Order</option>
+                  <option value="name-asc">Staff Name (A - Z)</option>
+                  <option value="loads-desc">Most Active Loads</option>
+                  <option value="rating-desc">Highest Rating First</option>
+                </select>
+              </div>
+            </FilterDropdown>
           </div>
 
-          <div className="flex items-center gap-3 self-end sm:self-auto">
+          <div className="flex items-center gap-3 self-end md:self-auto">
             <span className="text-xs font-semibold text-slate-400 hidden sm:inline">
               Showing {filteredDispatchers.length} of {dispatchers.length} Desks
             </span>
@@ -170,8 +301,8 @@ export function DispatcherList({
                           />
                         </div>
                       ) : (
-                        <div className="w-12 h-12 rounded-2xl bg-white/10 text-white font-extrabold flex items-center justify-center text-sm border border-white/15 shadow-sm shrink-0">
-                          {disp.name.split(" ").map((n) => n[0]).join("")}
+                        <div className="w-12 h-12 rounded-2xl bg-white/10 text-slate-300 flex items-center justify-center border border-white/15 shadow-sm shrink-0">
+                          <User className="w-6 h-6 text-slate-300" />
                         </div>
                       )}
                       <div>
@@ -229,8 +360,8 @@ export function DispatcherList({
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => deleteDispatcher(disp.id)}
-                        className="w-[48%] h-8 text-xs font-semibold bg-rose-500/10 border-rose-500/20 text-rose-300 hover:bg-rose-500/20"
+                        onClick={() => setDispatcherToDelete(disp)}
+                        className="w-[48%] h-8 text-xs font-semibold bg-rose-500/10 border-rose-500/20 text-rose-300 hover:bg-rose-500/20 cursor-pointer"
                       >
                         <Trash2 className="w-3.5 h-3.5 mr-1" /> Remove
                       </Button>
@@ -295,8 +426,8 @@ export function DispatcherList({
                                 />
                               </div>
                             ) : (
-                              <div className="w-10 h-10 rounded-xl bg-white/10 text-white font-extrabold flex items-center justify-center text-xs border border-white/15 shrink-0">
-                                {disp.name.split(" ").map((n) => n[0]).join("")}
+                              <div className="w-10 h-10 rounded-xl bg-white/10 text-slate-300 flex items-center justify-center border border-white/15 shrink-0">
+                                <User className="w-5 h-5 text-slate-300" />
                               </div>
                             )}
                             <div>
@@ -339,15 +470,15 @@ export function DispatcherList({
                               variant="ghost"
                               size="sm"
                               onClick={() => setDispatcherToEdit(disp)}
-                              className="h-8 px-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 text-xs font-semibold"
+                              className="h-8 px-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 text-xs font-semibold cursor-pointer"
                             >
                               <Edit2 className="w-3.5 h-3.5 mr-1" /> Edit
                             </Button>
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => deleteDispatcher(disp.id)}
-                              className="h-8 px-2.5 rounded-lg text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 text-xs font-semibold"
+                              onClick={() => setDispatcherToDelete(disp)}
+                              className="h-8 px-2.5 rounded-lg text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 text-xs font-semibold cursor-pointer"
                             >
                               <Trash2 className="w-3.5 h-3.5 mr-1" /> Remove
                             </Button>
@@ -390,6 +521,29 @@ export function DispatcherList({
         userToEdit={dispatcherToEdit}
         companyId={companyId}
         companyName={companyName}
+      />
+
+      {/* Reusable Delete Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={!!dispatcherToDelete}
+        onClose={() => setDispatcherToDelete(null)}
+        onConfirm={() => {
+          if (dispatcherToDelete) {
+            deleteDispatcher(dispatcherToDelete.id);
+            setDispatcherToDelete(null);
+          }
+        }}
+        title="Remove Fleet Dispatcher"
+        description={`Are you sure you want to remove dispatcher "${dispatcherToDelete?.name}"? Active desk duties and load dispatch authority will be unassigned.`}
+        confirmText="Remove Dispatcher"
+        cancelText="Cancel"
+        variant="danger"
+        itemDetails={[
+          { label: "Dispatcher Name", value: dispatcherToDelete?.name || "" },
+          { label: "Email Address", value: dispatcherToDelete?.email || "" },
+          { label: "Desk Assignment", value: dispatcherToDelete?.deskAssignment || "" },
+          { label: "Lifetime Loads", value: `${dispatcherToDelete?.totalLoadsDispatched || 0} Loads` },
+        ]}
       />
     </div>
   );

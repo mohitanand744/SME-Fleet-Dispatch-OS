@@ -1,11 +1,13 @@
 "use client";
 
-import { FileSpreadsheet, Download, Clock, CheckCircle2 } from "lucide-react";
+import { useState } from "react";
+import { FileSpreadsheet, Download, Clock, CheckCircle2, Filter } from "lucide-react";
 import { Button } from "@/components/atoms/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/atoms/card";
 import { StatusBadge } from "@/features/shared/components/StatusBadge";
+import { ExportDataModal } from "@/components/molecules/ExportDataModal";
 
-const dispatchLogs = [
+const initialDispatchLogs = [
   { id: "LOG-9912", time: "14:25 PM", event: "Load LD-8801 Arrived at Phoenix DC", driver: "Robert Miller", type: "delivered" },
   { id: "LOG-9911", time: "13:10 PM", event: "Driver Assigned to LD-8804 (Alex Rivera)", driver: "Alex Rivera", type: "assigned" },
   { id: "LOG-9910", time: "11:45 AM", event: "Weather Alert: I-80 corridor slow traffic", driver: "System Alert", type: "delayed" },
@@ -14,6 +16,14 @@ const dispatchLogs = [
 ];
 
 export default function DispatcherLogsPage() {
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [filterType, setFilterType] = useState<string>("all");
+
+  const filteredLogs = initialDispatchLogs.filter((log) => {
+    if (filterType === "all") return true;
+    return log.type === filterType;
+  });
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -23,18 +33,41 @@ export default function DispatcherLogsPage() {
             Immutable audit log of all route milestones, driver status changes, and freight events.
           </p>
         </div>
-        <Button className="bg-white/10 hover:bg-white/20 text-white border border-white/15 shadow-sm font-semibold">
-          <Download className="w-4 h-4 mr-2" /> Export Audit Log
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button
+            onClick={() => setIsExportModalOpen(true)}
+            className="bg-white/10 hover:bg-white/20 text-white border border-white/15 shadow-sm font-semibold cursor-pointer"
+          >
+            <Download className="w-4 h-4 mr-2" /> Export Audit Log
+          </Button>
+        </div>
       </div>
 
-      <Card className="border border-white/10 shadow-xl bg-[#0B1020] text-white rounded-2xl">
-        <CardHeader className="border-b border-white/10 pb-4">
+      {/* Filter Chips */}
+      <div className="flex items-center gap-2 border-b border-white/10 pb-3 overflow-x-auto custom-scrollbar">
+        {["all", "delivered", "assigned", "delayed", "active", "pending"].map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setFilterType(tab)}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all capitalize border cursor-pointer ${
+              filterType === tab
+                ? "bg-white/15 text-white border-white/20 shadow-sm"
+                : "bg-white/5 text-slate-400 border-white/10 hover:text-white hover:bg-white/10"
+            }`}
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
+
+      <Card className="border border-white/10 shadow-xl bg-[#0B1020] text-white rounded-2xl overflow-hidden">
+        <CardHeader className="border-b border-white/10 pb-4 flex flex-row items-center justify-between">
           <CardTitle className="text-base font-bold text-white">Today's Event Stream</CardTitle>
+          <span className="text-xs font-semibold text-slate-400">{filteredLogs.length} Events</span>
         </CardHeader>
         <CardContent className="p-0">
           <div className="divide-y divide-white/5">
-            {dispatchLogs.map((log) => (
+            {filteredLogs.map((log) => (
               <div key={log.id} className="p-4 flex items-center justify-between hover:bg-white/5 transition-colors">
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-xl bg-blue-500/20 text-blue-400 font-mono text-xs font-bold border border-blue-500/30">
@@ -54,6 +87,13 @@ export default function DispatcherLogsPage() {
           </div>
         </CardContent>
       </Card>
+
+      <ExportDataModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        title="Export Dispatch Audit Logs"
+        defaultFilename="dispatch_audit_logs_august_2026"
+      />
     </div>
   );
 }

@@ -24,26 +24,64 @@ import { ViewToggle, ViewMode } from "@/components/atoms/ViewToggle";
 import { ZoomableImage } from "@/context/ImageLightboxContext";
 import { cn } from "@/lib/utils";
 
+import { FilterDropdown } from "@/components/molecules/FilterDropdown";
+
 export function AvailableTrucksView() {
   const { trucks } = useTrucksData();
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [carrierFilter, setCarrierFilter] = useState<string>("all");
+  const [fuelFilter, setFuelFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("default");
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [selectedTruckForDispatch, setSelectedTruckForDispatch] = useState<TruckItem | null>(null);
   const [assignedLoadNumber, setAssignedLoadNumber] = useState("");
   const [dispatchSuccess, setDispatchSuccess] = useState(false);
 
+  const activeFilterCount =
+    (carrierFilter !== "all" ? 1 : 0) +
+    (fuelFilter !== "all" ? 1 : 0) +
+    (sortBy !== "default" ? 1 : 0);
+
+  const handleResetFilters = () => {
+    setCarrierFilter("all");
+    setFuelFilter("all");
+    setSortBy("default");
+    setTypeFilter("all");
+  };
+
   // Filter trucks that are available or active in the membership network
-  const availableTrucks = trucks.filter((truck) => {
-    const matchesSearch =
-      truck.plate.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      truck.model.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      truck.companyName.toLowerCase().includes(searchQuery.toLowerCase());
+  const availableTrucks = trucks
+    .filter((truck) => {
+      const matchesSearch =
+        truck.plate.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        truck.model.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        truck.companyName.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesType = typeFilter === "all" ? true : truck.type.toLowerCase().includes(typeFilter.toLowerCase());
+      const matchesType = typeFilter === "all" ? true : truck.type.toLowerCase().includes(typeFilter.toLowerCase());
 
-    return matchesSearch && matchesType;
-  });
+      const matchesCarrier =
+        carrierFilter === "all"
+          ? true
+          : truck.companyName.toLowerCase().includes(carrierFilter.toLowerCase());
+
+      const matchesFuel =
+        fuelFilter === "all"
+          ? true
+          : fuelFilter === "high"
+          ? truck.fuelLevel >= 70
+          : fuelFilter === "low"
+          ? truck.fuelLevel < 30
+          : true;
+
+      return matchesSearch && matchesType && matchesCarrier && matchesFuel;
+    })
+    .sort((a, b) => {
+      if (sortBy === "plate-asc") return a.plate.localeCompare(b.plate);
+      if (sortBy === "fuel-desc") return b.fuelLevel - a.fuelLevel;
+      return 0;
+    });
 
   const handleAssignLoad = (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,7 +95,7 @@ export function AvailableTrucksView() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full">
       {/* Top Header Row */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -77,14 +115,97 @@ export function AvailableTrucksView() {
       {/* Filter and Search Bar */}
       <div className="p-4 rounded-2xl bg-[#0B1020] border border-white/10 shadow-xl space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-          <div className="relative w-full md:w-80">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <Input
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Filter by plate, model, carrier..."
-              className="pl-9 h-10 bg-[#0E1528] border-white/10 text-white placeholder:text-slate-400 text-sm rounded-xl"
-            />
+          <div className="flex items-center gap-2.5 flex-1 max-w-xl">
+            <div className="relative flex-1">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Filter by plate, model, carrier..."
+                className="pl-9 h-10 bg-[#0E1528] border-white/10 text-white placeholder:text-slate-400 text-sm rounded-xl w-full"
+              />
+            </div>
+
+            {/* Modern Filter Popover */}
+            <FilterDropdown
+              isOpen={isFilterOpen}
+              onToggle={() => setIsFilterOpen(!isFilterOpen)}
+              onClose={() => setIsFilterOpen(false)}
+              onClear={handleResetFilters}
+              activeCount={activeFilterCount}
+              title="Filter Available Trucks"
+            >
+              {/* Carrier Network */}
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  Affiliated Carrier Network
+                </label>
+                <div className="grid grid-cols-1 gap-1.5 text-xs">
+                  {[
+                    { id: "all", label: "All Carrier Networks" },
+                    { id: "apex", label: "Apex Global Carrier LLC" },
+                    { id: "vanguard", label: "Vanguard Dispatch Network" },
+                  ].map((c) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      onClick={() => setCarrierFilter(c.id)}
+                      className={cn(
+                        "px-2.5 py-1.5 rounded-xl font-semibold text-left transition-all border",
+                        carrierFilter === c.id
+                          ? "bg-emerald-600/30 border-emerald-500 text-white font-bold"
+                          : "bg-white/5 border-white/5 text-slate-400 hover:text-white hover:bg-white/10"
+                      )}
+                    >
+                      {c.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Fuel Level */}
+              <div className="space-y-1.5 pt-2 border-t border-white/10">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  Fuel Level
+                </label>
+                <div className="grid grid-cols-2 gap-1.5 text-xs">
+                  {[
+                    { id: "all", label: "Any Level" },
+                    { id: "high", label: "70% or Above" },
+                  ].map((f) => (
+                    <button
+                      key={f.id}
+                      type="button"
+                      onClick={() => setFuelFilter(f.id)}
+                      className={cn(
+                        "px-2 py-1.5 rounded-xl font-semibold text-center transition-all border text-[11px]",
+                        fuelFilter === f.id
+                          ? "bg-emerald-600/30 border-emerald-500 text-white font-bold"
+                          : "bg-white/5 border-white/5 text-slate-400 hover:text-white hover:bg-white/10"
+                      )}
+                    >
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Sort Order */}
+              <div className="space-y-1.5 pt-2 border-t border-white/10">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  Sort Order
+                </label>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="w-full h-9 bg-[#0E1528] border border-white/10 text-white text-xs rounded-xl px-3 focus:outline-hidden"
+                >
+                  <option value="default">Default Order</option>
+                  <option value="plate-asc">License Plate (A - Z)</option>
+                  <option value="fuel-desc">Highest Fuel Level First</option>
+                </select>
+              </div>
+            </FilterDropdown>
           </div>
 
           <div className="flex items-center gap-3 self-end md:self-auto">
@@ -103,7 +224,6 @@ export function AvailableTrucksView() {
             { id: "reefer", label: "Reefers" },
             { id: "box", label: "Box Trucks" },
             { id: "flatbed", label: "Flatbeds" },
-            { id: "van", label: "Cargo Vans" },
           ].map((tab) => (
             <button
               key={tab.id}

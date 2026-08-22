@@ -1,9 +1,30 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { X, ZoomIn, Download, Maximize2, ExternalLink } from "lucide-react";
+import {
+  X,
+  ZoomIn,
+  Download,
+  Maximize2,
+  ExternalLink,
+  Truck,
+  User,
+  Headphones,
+  Shield,
+  Building2,
+  Image as ImageIcon,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+
+export type ImageFallbackType =
+  | "truck"
+  | "driver"
+  | "dispatcher"
+  | "admin"
+  | "user"
+  | "organization"
+  | "generic";
 
 interface LightboxState {
   isOpen: boolean;
@@ -26,9 +47,13 @@ export function ImageLightboxProvider({ children }: { children: React.ReactNode 
     alt: "",
     title: "",
   });
+  const [lightboxImgError, setLightboxImgError] = useState(false);
+  const [isLightboxLoading, setIsLightboxLoading] = useState(true);
 
   const openLightbox = (src: string, alt?: string, title?: string) => {
     if (!src) return;
+    setLightboxImgError(false);
+    setIsLightboxLoading(true);
     setLightbox({
       isOpen: true,
       src,
@@ -148,26 +173,50 @@ export function ImageLightboxProvider({ children }: { children: React.ReactNode 
                   type="button"
                   onClick={closeLightbox}
                   className="p-2 sm:p-2.5 rounded-full bg-[#0B1020]/90 hover:bg-rose-500/20 text-slate-300 hover:text-rose-300 border border-white/15 backdrop-blur-md transition-all shadow-lg cursor-pointer"
-                  title="Close (ESC)"
+                  title="Close Full View (Esc)"
                 >
                   <X className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               </div>
             </motion.div>
 
-            {/* Central Zoomed Image Container */}
+            {/* Main Lightbox Content */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.88, y: 15 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.88, y: 15 }}
+              initial={{ scale: 0.92, opacity: 0, y: 15 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.92, opacity: 0, y: 15 }}
               transition={{ type: "spring", damping: 26, stiffness: 320 }}
-              className="relative max-w-5xl max-h-[85vh] w-full rounded-3xl overflow-hidden shadow-2xl border border-white/20 z-10 bg-[#0B1020]/40 backdrop-blur-xs flex items-center justify-center p-1.5 select-none"
+              className="relative z-10 max-w-5xl w-full max-h-[85vh] flex items-center justify-center pointer-events-auto select-none"
+              onClick={(e) => e.stopPropagation()}
             >
-              <img
-                src={lightbox.src}
-                alt={lightbox.alt || "Fullscreen Asset"}
-                className="max-h-[80vh] w-auto max-w-full object-contain rounded-2xl shadow-2xl"
-              />
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/20 bg-[#0B1020]/80 backdrop-blur-xl p-2 sm:p-3 flex items-center justify-center min-h-[300px] min-w-[300px]">
+                {isLightboxLoading && !lightboxImgError && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-[#0B1020]/60 z-10">
+                    <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-blue-400 animate-spin" />
+                  </div>
+                )}
+
+                {lightboxImgError ? (
+                  <div className="p-8 flex flex-col items-center justify-center text-slate-400 space-y-3 text-center">
+                    <div className="p-4 rounded-2xl bg-blue-500/20 border border-blue-500/30 text-blue-400">
+                      <Truck className="w-12 h-12" />
+                    </div>
+                    <h4 className="text-white font-bold text-base">{lightbox.title}</h4>
+                    <p className="text-xs text-slate-400">Asset image preview unavailable on this connection.</p>
+                  </div>
+                ) : (
+                  <img
+                    src={lightbox.src}
+                    alt={lightbox.alt}
+                    onLoad={() => setIsLightboxLoading(false)}
+                    onError={() => {
+                      setIsLightboxLoading(false);
+                      setLightboxImgError(true);
+                    }}
+                    className="max-h-[80vh] w-auto max-w-full rounded-2xl object-contain shadow-2xl border border-white/10"
+                  />
+                )}
+              </div>
             </motion.div>
           </div>
         )}
@@ -184,10 +233,11 @@ export function useImageLightbox() {
   return context;
 }
 
-interface ZoomableImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
+export interface ZoomableImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   containerClassName?: string;
   captionTitle?: string;
   showZoomBadge?: boolean;
+  fallbackType?: ImageFallbackType;
 }
 
 export function ZoomableImage({
@@ -197,11 +247,119 @@ export function ZoomableImage({
   className,
   containerClassName,
   showZoomBadge = true,
+  fallbackType,
   ...props
 }: ZoomableImageProps) {
+  const [hasError, setHasError] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const { openLightbox } = useImageLightbox();
 
-  if (!src) return null;
+  useEffect(() => {
+    setHasError(false);
+    setIsLoading(true);
+  }, [src]);
+
+  // Determine fallback type automatically
+  const resolvedType: ImageFallbackType = React.useMemo(() => {
+    if (fallbackType) return fallbackType;
+    const lower = (alt + " " + (captionTitle || "")).toLowerCase();
+    if (
+      lower.includes("truck") ||
+      lower.includes("van") ||
+      lower.includes("transit") ||
+      lower.includes("peterbilt") ||
+      lower.includes("freightliner") ||
+      lower.includes("kenworth") ||
+      lower.includes("volvo") ||
+      lower.includes("cascadia") ||
+      lower.includes("flatbed") ||
+      lower.includes("reefer") ||
+      lower.includes("semi") ||
+      lower.includes("unit")
+    ) {
+      return "truck";
+    }
+    if (lower.includes("driver")) return "driver";
+    if (lower.includes("dispatcher")) return "dispatcher";
+    if (lower.includes("admin")) return "admin";
+    if (lower.includes("user") || lower.includes("profile") || lower.includes("avatar")) return "user";
+    if (lower.includes("company") || lower.includes("organization") || lower.includes("carrier"))
+      return "organization";
+    return "generic";
+  }, [fallbackType, alt, captionTitle]);
+
+  const renderFallback = () => {
+    switch (resolvedType) {
+      case "truck":
+        return (
+          <div className="w-full h-full min-h-[140px] flex flex-col items-center justify-center bg-gradient-to-br from-[#0B1020] via-[#0E1528] to-[#131B34] text-slate-400 p-4 select-none">
+            <div className="p-3 rounded-2xl bg-blue-500/15 border border-blue-500/25 text-blue-400 shadow-inner mb-2">
+              <Truck className="w-8 h-8 text-blue-400" />
+            </div>
+            <span className="text-[11px] font-bold tracking-wider uppercase text-slate-300">
+              Fleet Commercial Vehicle
+            </span>
+            <span className="text-[10px] text-slate-500 truncate max-w-[90%] mt-0.5">
+              {alt || "Vehicle Unit"}
+            </span>
+          </div>
+        );
+
+      case "driver":
+      case "user":
+        return (
+          <div className="w-full h-full flex flex-col items-center justify-center bg-[#0E1528] text-slate-300 p-2 select-none">
+            <div className="p-2 rounded-xl bg-white/10 text-slate-300 border border-white/15">
+              <User className="w-5 h-5 text-slate-300" />
+            </div>
+          </div>
+        );
+
+      case "dispatcher":
+        return (
+          <div className="w-full h-full flex flex-col items-center justify-center bg-[#0E1528] text-emerald-400 p-2 select-none">
+            <div className="p-2 rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+              <Headphones className="w-5 h-5" />
+            </div>
+          </div>
+        );
+
+      case "admin":
+        return (
+          <div className="w-full h-full flex flex-col items-center justify-center bg-[#0E1528] text-purple-400 p-2 select-none">
+            <div className="p-2 rounded-xl bg-purple-500/15 text-purple-400 border border-purple-500/25">
+              <Shield className="w-5 h-5" />
+            </div>
+          </div>
+        );
+
+      case "organization":
+        return (
+          <div className="w-full h-full flex flex-col items-center justify-center bg-[#0E1528] text-blue-400 p-2 select-none">
+            <div className="p-2 rounded-xl bg-blue-500/15 text-blue-400 border border-blue-500/25">
+              <Building2 className="w-5 h-5" />
+            </div>
+          </div>
+        );
+
+      case "generic":
+      default:
+        return (
+          <div className="w-full h-full flex flex-col items-center justify-center bg-[#0E1528] text-slate-500 p-3 select-none">
+            <ImageIcon className="w-6 h-6 text-slate-500 mb-1" />
+            <span className="text-[10px] font-semibold text-slate-500">Image Unavailable</span>
+          </div>
+        );
+    }
+  };
+
+  if (!src || hasError) {
+    return (
+      <div className={cn("relative overflow-hidden", containerClassName)}>
+        {renderFallback()}
+      </div>
+    );
+  }
 
   return (
     <div
@@ -213,18 +371,35 @@ export function ZoomableImage({
       data-lightbox-alt={alt}
       data-lightbox-title={captionTitle || alt}
       className={cn(
-        "zoomable-image-wrapper relative cursor-zoom-in group overflow-hidden select-none",
+        "zoomable-image-wrapper relative cursor-zoom-in group overflow-hidden select-none bg-[#0E1528]",
         containerClassName
       )}
       title="Click to view full-screen"
     >
+      {/* Loading Skeleton */}
+      {isLoading && (
+        <div className="absolute inset-0 bg-[#0E1528] animate-pulse flex items-center justify-center z-10">
+          <div className="w-5 h-5 rounded-full border-2 border-white/20 border-t-blue-400 animate-spin" />
+        </div>
+      )}
+
       <img
         src={src}
         alt={alt}
-        className={cn("w-full h-full object-cover transition-transform duration-500 group-hover:scale-105", className)}
+        onLoad={() => setIsLoading(false)}
+        onError={() => {
+          setIsLoading(false);
+          setHasError(true);
+        }}
+        className={cn(
+          "w-full h-full object-cover transition-all duration-500 group-hover:scale-105",
+          isLoading ? "opacity-0 scale-98" : "opacity-100 scale-100",
+          className
+        )}
         {...props}
       />
-      {showZoomBadge && (
+
+      {showZoomBadge && !isLoading && (
         <div className="absolute top-2.5 left-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10 pointer-events-none">
           <div className="p-1.5 rounded-lg bg-black/70 backdrop-blur-md border border-white/20 text-white shadow-md flex items-center gap-1 text-[10px] font-bold">
             <ZoomIn className="w-3.5 h-3.5" />

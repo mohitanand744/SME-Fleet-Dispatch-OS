@@ -27,16 +27,19 @@ import { DataNotFound } from "@/components/molecules/DataNotFound";
 import { TruckItem } from "@/data/mock-trucks";
 import { useTrucksData, useDriversData } from "@/data";
 import { TruckModal } from "./TruckModal";
-import { TruckDeleteDialog } from "./TruckDeleteDialog";
+import { ConfirmationModal } from "@/components/molecules/ConfirmationModal";
 import { ViewToggle } from "@/components/atoms/ViewToggle";
 import { ZoomableImage } from "@/context/ImageLightboxContext";
 import { cn } from "@/lib/utils";
+
+import { FilterDropdown } from "@/components/molecules/FilterDropdown";
 
 interface TruckListProps {
   title?: string;
   subtitle?: string;
   companyId?: string;
   companyName?: string;
+  readOnly?: boolean;
 }
 
 export function TruckList({
@@ -44,12 +47,18 @@ export function TruckList({
   subtitle = "Register, assign, inspect, and manage commercial vehicle assets.",
   companyId,
   companyName,
+  readOnly = false,
 }: TruckListProps) {
   const { trucks, addTruck, updateTruck, deleteTruck } = useTrucksData(companyId);
   const { drivers } = useDriversData(companyId);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [assignmentFilter, setAssignmentFilter] = useState<string>("all");
+  const [fuelFilter, setFuelFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("default");
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
 
   // Modal States
@@ -57,20 +66,70 @@ export function TruckList({
   const [truckToEdit, setTruckToEdit] = useState<TruckItem | null>(null);
   const [truckToDelete, setTruckToDelete] = useState<TruckItem | null>(null);
 
-  const filteredTrucks = trucks.filter((truck) => {
-    const matchesSearch =
-      truck.plate.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      truck.model.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      truck.vin.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (truck.assignedDriverName && truck.assignedDriverName.toLowerCase().includes(searchQuery.toLowerCase()));
+  // Calculate active filter count (excluding statusFilter if it's on tab, or include if not default)
+  const activeFilterCount =
+    (typeFilter !== "all" ? 1 : 0) +
+    (assignmentFilter !== "all" ? 1 : 0) +
+    (fuelFilter !== "all" ? 1 : 0) +
+    (sortBy !== "default" ? 1 : 0);
 
-    const matchesStatus = statusFilter === "all" ? true : truck.status === statusFilter;
+  const handleResetFilters = () => {
+    setTypeFilter("all");
+    setAssignmentFilter("all");
+    setFuelFilter("all");
+    setSortBy("default");
+    setStatusFilter("all");
+  };
 
-    return matchesSearch && matchesStatus;
-  });
+  const filteredTrucks = trucks
+    .filter((truck) => {
+      const matchesSearch =
+        truck.plate.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        truck.model.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        truck.vin.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (truck.assignedDriverName && truck.assignedDriverName.toLowerCase().includes(searchQuery.toLowerCase()));
+
+      const matchesStatus = statusFilter === "all" ? true : truck.status === statusFilter;
+
+      const matchesType =
+        typeFilter === "all" ? true : truck.type.toLowerCase().includes(typeFilter.toLowerCase());
+
+      const matchesAssignment =
+        assignmentFilter === "all"
+          ? true
+          : assignmentFilter === "assigned"
+          ? Boolean(truck.assignedDriverId)
+          : !truck.assignedDriverId;
+
+      const matchesFuel =
+        fuelFilter === "all"
+          ? true
+          : fuelFilter === "high"
+          ? truck.fuelLevel >= 70
+          : fuelFilter === "medium"
+          ? truck.fuelLevel >= 30 && truck.fuelLevel < 70
+          : truck.fuelLevel < 30;
+
+      return matchesSearch && matchesStatus && matchesType && matchesAssignment && matchesFuel;
+    })
+    .sort((a, b) => {
+      if (sortBy === "plate-asc") return a.plate.localeCompare(b.plate);
+      if (sortBy === "mileage-desc") {
+        const mA = parseInt(a.mileage.replace(/[^0-9]/g, "")) || 0;
+        const mB = parseInt(b.mileage.replace(/[^0-9]/g, "")) || 0;
+        return mB - mA;
+      }
+      if (sortBy === "mileage-asc") {
+        const mA = parseInt(a.mileage.replace(/[^0-9]/g, "")) || 0;
+        const mB = parseInt(b.mileage.replace(/[^0-9]/g, "")) || 0;
+        return mA - mB;
+      }
+      if (sortBy === "fuel-desc") return b.fuelLevel - a.fuelLevel;
+      return 0;
+    });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full">
       {/* Top Action Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -78,28 +137,147 @@ export function TruckList({
           <p className="text-slate-400 text-sm mt-1">{subtitle}</p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <Button
-            onClick={() => setIsCreateModalOpen(true)}
-            className="bg-white/10 hover:bg-white/20 text-white border border-white/15 shadow-sm font-semibold"
-          >
-            <Plus className="w-4 h-4 mr-2" /> Register New Truck
-          </Button>
-        </div>
+        {!readOnly && (
+          <div className="flex items-center gap-3">
+            <Button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="bg-white/10 hover:bg-white/20 text-white border border-white/15 shadow-sm font-semibold"
+            >
+              <Plus className="w-4 h-4 mr-2" /> Register New Truck
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Filter and View Toggle Toolbar */}
       <div className="p-4 rounded-2xl bg-[#0B1020] border border-white/10 shadow-xl space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-          {/* Search bar */}
-          <div className="relative w-full md:w-80">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <Input
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search plate, model, driver, VIN..."
-              className="pl-9 h-10 bg-[#0E1528] border-white/10 text-white placeholder:text-slate-400 text-sm rounded-xl"
-            />
+          {/* Search bar & Filter Dropdown */}
+          <div className="flex items-center gap-2.5 flex-1 max-w-xl">
+            <div className="relative flex-1">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search plate, model, driver, VIN..."
+                className="pl-9 h-10 bg-[#0E1528] border-white/10 text-white placeholder:text-slate-400 text-sm rounded-xl w-full"
+              />
+            </div>
+
+            {/* Modern Filter Popover */}
+            <FilterDropdown
+              isOpen={isFilterOpen}
+              onToggle={() => setIsFilterOpen(!isFilterOpen)}
+              onClose={() => setIsFilterOpen(false)}
+              onClear={handleResetFilters}
+              activeCount={activeFilterCount}
+              title="Filter Fleet Assets"
+            >
+              {/* Vehicle Type Filter */}
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  Vehicle Body & Equipment Type
+                </label>
+                <div className="grid grid-cols-2 gap-1.5 text-xs">
+                  {[
+                    { id: "all", label: "All Types" },
+                    { id: "semi", label: "Semi-Truck" },
+                    { id: "dry van", label: "Dry Van 53'" },
+                    { id: "reefer", label: "Refrigerated" },
+                    { id: "flatbed", label: "Flatbed" },
+                    { id: "box", label: "Box Truck" },
+                  ].map((t) => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => setTypeFilter(t.id)}
+                      className={cn(
+                        "px-2.5 py-1.5 rounded-xl font-semibold text-left transition-all border",
+                        typeFilter === t.id
+                          ? "bg-blue-600/30 border-blue-500 text-white font-bold"
+                          : "bg-white/5 border-white/5 text-slate-400 hover:text-white hover:bg-white/10"
+                      )}
+                    >
+                      {t.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Driver Assignment Filter */}
+              <div className="space-y-1.5 pt-2 border-t border-white/10">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  Driver Assignment Status
+                </label>
+                <div className="grid grid-cols-3 gap-1.5 text-xs">
+                  {[
+                    { id: "all", label: "All Assets" },
+                    { id: "assigned", label: "Assigned" },
+                    { id: "unassigned", label: "Unassigned" },
+                  ].map((a) => (
+                    <button
+                      key={a.id}
+                      type="button"
+                      onClick={() => setAssignmentFilter(a.id)}
+                      className={cn(
+                        "px-2 py-1.5 rounded-xl font-semibold text-center transition-all border text-[11px]",
+                        assignmentFilter === a.id
+                          ? "bg-blue-600/30 border-blue-500 text-white font-bold"
+                          : "bg-white/5 border-white/5 text-slate-400 hover:text-white hover:bg-white/10"
+                      )}
+                    >
+                      {a.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Fuel Level Range Filter */}
+              <div className="space-y-1.5 pt-2 border-t border-white/10">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  Fuel Level
+                </label>
+                <div className="grid grid-cols-3 gap-1.5 text-xs">
+                  {[
+                    { id: "all", label: "Any Level" },
+                    { id: "high", label: "70% or Above" },
+                    { id: "low", label: "Under 30%" },
+                  ].map((f) => (
+                    <button
+                      key={f.id}
+                      type="button"
+                      onClick={() => setFuelFilter(f.id)}
+                      className={cn(
+                        "px-2 py-1.5 rounded-xl font-semibold text-center transition-all border text-[11px]",
+                        fuelFilter === f.id
+                          ? "bg-blue-600/30 border-blue-500 text-white font-bold"
+                          : "bg-white/5 border-white/5 text-slate-400 hover:text-white hover:bg-white/10"
+                      )}
+                    >
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Sort Order */}
+              <div className="space-y-1.5 pt-2 border-t border-white/10">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  Sort Order
+                </label>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="w-full h-9 bg-[#0E1528] border border-white/10 text-white text-xs rounded-xl px-3 focus:outline-hidden"
+                >
+                  <option value="default">Default Order</option>
+                  <option value="plate-asc">License Plate (A - Z)</option>
+                  <option value="mileage-desc">Highest Mileage First</option>
+                  <option value="mileage-asc">Lowest Mileage First</option>
+                  <option value="fuel-desc">Highest Fuel Level First</option>
+                </select>
+              </div>
+            </FilterDropdown>
           </div>
 
           {/* Right controls: View Toggle and Count */}
@@ -116,10 +294,9 @@ export function TruckList({
           {[
             { id: "all", label: "All Vehicles" },
             { id: "available", label: "Available" },
-            { id: "active", label: "Active" },
             { id: "in_transit", label: "In Transit" },
             { id: "maintenance", label: "Maintenance" },
-            { id: "idle", label: "Idle" },
+            { id: "inactive", label: "Inactive" },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -159,13 +336,20 @@ export function TruckList({
                 <Card className="border border-white/10 shadow-xl bg-[#0B1020] text-white hover:border-white/25 transition-all rounded-3xl overflow-hidden group flex flex-col h-full">
                   {/* Photo Header */}
                   <div className="relative h-44 w-full bg-[#080D1A] overflow-hidden">
-                    <ZoomableImage
-                      src={item.imageUrl || "https://images.surferseo.art/de392d7b-7978-40fd-b3d8-05cd9eb4b91e.jpeg"}
-                      alt={item.model}
-                      captionTitle={`${item.plate} • ${item.model} (${item.type})`}
-                      containerClassName="w-full h-full"
-                      className="w-full h-full object-cover object-center"
-                    />
+                    {item.imageUrl ? (
+                      <ZoomableImage
+                        src={item.imageUrl}
+                        alt={item.model}
+                        captionTitle={`${item.plate} • ${item.model} (${item.type})`}
+                        containerClassName="w-full h-full"
+                        className="w-full h-full object-cover object-center"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-b from-[#0E1528] to-[#080D1A] text-slate-500">
+                        <Truck className="w-14 h-14 text-slate-400/50" />
+                        <span className="text-[10px] font-semibold text-slate-500 mt-1 uppercase tracking-wider">No Photo Registered</span>
+                      </div>
+                    )}
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0B1020] via-transparent to-black/30 pointer-events-none" />
 
                     {/* Floating Status Badge */}
@@ -219,24 +403,26 @@ export function TruckList({
                       </div>
                     </div>
 
-                    <div className="pt-3 border-t border-white/10 flex items-center justify-between gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setTruckToEdit(item)}
-                        className="w-[48%] h-8 text-xs font-semibold bg-white/5 border-white/10 text-slate-200 hover:bg-white/10 hover:text-white"
-                      >
-                        <Edit2 className="w-3.5 h-3.5 mr-1" /> Edit
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setTruckToDelete(item)}
-                        className="w-[48%] h-8 text-xs font-semibold bg-rose-500/10 border-rose-500/20 text-rose-300 hover:bg-rose-500/20"
-                      >
-                        <Trash2 className="w-3.5 h-3.5 mr-1" /> Delete
-                      </Button>
-                    </div>
+                    {!readOnly && (
+                      <div className="pt-3 border-t border-white/10 flex items-center justify-between gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setTruckToEdit(item)}
+                          className="w-[48%] h-8 text-xs font-semibold bg-white/5 border-white/10 text-slate-200 hover:bg-white/10 hover:text-white"
+                        >
+                          <Edit2 className="w-3.5 h-3.5 mr-1" /> Edit
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setTruckToDelete(item)}
+                          className="w-[48%] h-8 text-xs font-semibold bg-rose-500/10 border-rose-500/20 text-rose-300 hover:bg-rose-500/20"
+                        >
+                          <Trash2 className="w-3.5 h-3.5 mr-1" /> Delete
+                        </Button>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </motion.div>
@@ -257,7 +443,7 @@ export function TruckList({
                   <th className="px-6 py-4">Status</th>
                   <th className="px-6 py-4">Assigned Driver</th>
                   <th className="px-6 py-4">Fuel & Mileage</th>
-                  <th className="px-6 py-4 text-right">Actions</th>
+                  {!readOnly && <th className="px-6 py-4 text-right">Actions</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5 font-medium text-slate-300">
@@ -285,15 +471,19 @@ export function TruckList({
                       >
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-14 h-11 rounded-xl overflow-hidden bg-[#080D1A] border border-white/15 shrink-0 shadow-sm relative">
-                              <ZoomableImage
-                                src={item.imageUrl || "https://images.surferseo.art/de392d7b-7978-40fd-b3d8-05cd9eb4b91e.jpeg"}
-                                alt={item.plate}
-                                captionTitle={`${item.plate} • ${item.model}`}
-                                containerClassName="w-full h-full"
-                                className="w-full h-full object-cover"
-                                showZoomBadge={false}
-                              />
+                            <div className="w-14 h-11 rounded-xl overflow-hidden bg-[#080D1A] border border-white/15 shrink-0 shadow-sm relative flex items-center justify-center">
+                              {item.imageUrl ? (
+                                <ZoomableImage
+                                  src={item.imageUrl}
+                                  alt={item.plate}
+                                  captionTitle={`${item.plate} • ${item.model}`}
+                                  containerClassName="w-full h-full"
+                                  className="w-full h-full object-cover"
+                                  showZoomBadge={false}
+                                />
+                              ) : (
+                                <Truck className="w-5 h-5 text-slate-400" />
+                              )}
                             </div>
                             <div>
                               <p className="font-bold text-white font-mono">{item.plate}</p>
@@ -330,26 +520,28 @@ export function TruckList({
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-right">
-                          <div className="flex items-center justify-end gap-1.5">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setTruckToEdit(item)}
-                              className="h-8 px-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 text-xs font-semibold"
-                            >
-                              <Edit2 className="w-3.5 h-3.5 mr-1" /> Edit
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setTruckToDelete(item)}
-                              className="h-8 px-2.5 rounded-lg text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 text-xs font-semibold"
-                            >
-                              <Trash2 className="w-3.5 h-3.5 mr-1" /> Delete
-                            </Button>
-                          </div>
-                        </td>
+                        {!readOnly && (
+                          <td className="px-6 py-4 text-right">
+                            <div className="flex items-center justify-end gap-1.5">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setTruckToEdit(item)}
+                                className="h-8 px-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 text-xs font-semibold"
+                              >
+                                <Edit2 className="w-3.5 h-3.5 mr-1" /> Edit
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setTruckToDelete(item)}
+                                className="h-8 px-2.5 rounded-lg text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 text-xs font-semibold"
+                              >
+                                <Trash2 className="w-3.5 h-3.5 mr-1" /> Delete
+                              </Button>
+                            </div>
+                          </td>
+                        )}
                       </motion.tr>
                     ))
                   )}
@@ -380,16 +572,27 @@ export function TruckList({
         companyName={companyName}
       />
 
-      {/* Delete Confirmation Modal */}
-      <TruckDeleteDialog
+      {/* Reusable Delete Confirmation Modal */}
+      <ConfirmationModal
         isOpen={!!truckToDelete}
         onClose={() => setTruckToDelete(null)}
         onConfirm={() => {
           if (truckToDelete) {
             deleteTruck(truckToDelete.id);
+            setTruckToDelete(null);
           }
         }}
-        truck={truckToDelete}
+        title="Delete Truck Asset"
+        description={`Are you sure you want to permanently remove truck "${truckToDelete?.plate} - ${truckToDelete?.model}" from active fleet operations?`}
+        confirmText="Delete Truck"
+        cancelText="Cancel"
+        variant="danger"
+        itemDetails={[
+          { label: "License Plate", value: truckToDelete?.plate || "" },
+          { label: "Vehicle Model", value: truckToDelete?.model || "" },
+          { label: "Vehicle Type", value: truckToDelete?.type || "" },
+          { label: "Assigned Driver", value: truckToDelete?.assignedDriverName || "Unassigned" },
+        ]}
       />
     </div>
   );

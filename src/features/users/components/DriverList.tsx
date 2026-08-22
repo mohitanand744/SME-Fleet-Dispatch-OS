@@ -16,6 +16,7 @@ import {
   UserCheck,
   Send,
   MailPlus,
+  User,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/atoms/button";
@@ -27,15 +28,19 @@ import { useDriversData } from "@/data";
 import { DriverUser } from "@/data/mock-users";
 import { UserModal } from "./UserModal";
 import { InviteUserModal } from "./InviteUserModal";
+import { ConfirmationModal } from "@/components/molecules/ConfirmationModal";
 import { ViewToggle, ViewMode } from "@/components/atoms/ViewToggle";
 import { ZoomableImage } from "@/context/ImageLightboxContext";
 import { cn } from "@/lib/utils";
+
+import { FilterDropdown } from "@/components/molecules/FilterDropdown";
 
 interface DriverListProps {
   title?: string;
   subtitle?: string;
   companyId?: string;
   companyName?: string;
+  readOnly?: boolean;
 }
 
 export function DriverList({
@@ -43,30 +48,71 @@ export function DriverList({
   subtitle = "CDL certifications, duty statuses, assigned trucks, and safety ratings.",
   companyId,
   companyName,
+  readOnly = false,
 }: DriverListProps) {
   const { drivers, addDriver, updateDriver, deleteDriver } = useDriversData(companyId);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [assignmentFilter, setAssignmentFilter] = useState<string>("all");
+  const [ratingFilter, setRatingFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("default");
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [driverToEdit, setDriverToEdit] = useState<DriverUser | null>(null);
+  const [driverToDelete, setDriverToDelete] = useState<DriverUser | null>(null);
 
-  const filteredDrivers = drivers.filter((driver) => {
-    const matchesSearch =
-      driver.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      driver.licenseNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      driver.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (driver.assignedTruckPlate && driver.assignedTruckPlate.toLowerCase().includes(searchQuery.toLowerCase()));
+  const activeFilterCount =
+    (assignmentFilter !== "all" ? 1 : 0) +
+    (ratingFilter !== "all" ? 1 : 0) +
+    (sortBy !== "default" ? 1 : 0);
 
-    const matchesStatus = statusFilter === "all" ? true : driver.status === statusFilter;
+  const handleResetFilters = () => {
+    setAssignmentFilter("all");
+    setRatingFilter("all");
+    setSortBy("default");
+    setStatusFilter("all");
+  };
 
-    return matchesSearch && matchesStatus;
-  });
+  const filteredDrivers = drivers
+    .filter((driver) => {
+      const matchesSearch =
+        driver.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        driver.licenseNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        driver.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (driver.assignedTruckPlate && driver.assignedTruckPlate.toLowerCase().includes(searchQuery.toLowerCase()));
+
+      const matchesStatus = statusFilter === "all" ? true : driver.status === statusFilter;
+
+      const matchesAssignment =
+        assignmentFilter === "all"
+          ? true
+          : assignmentFilter === "assigned"
+          ? Boolean(driver.assignedTruckPlate)
+          : !driver.assignedTruckPlate;
+
+      const matchesRating =
+        ratingFilter === "all"
+          ? true
+          : ratingFilter === "4.8"
+          ? driver.rating >= 4.8
+          : ratingFilter === "4.5"
+          ? driver.rating >= 4.5
+          : driver.rating >= 4.0;
+
+      return matchesSearch && matchesStatus && matchesAssignment && matchesRating;
+    })
+    .sort((a, b) => {
+      if (sortBy === "name-asc") return a.name.localeCompare(b.name);
+      if (sortBy === "rating-desc") return b.rating - a.rating;
+      if (sortBy === "loads-desc") return b.totalTrips - a.totalTrips;
+      return 0;
+    });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -74,38 +120,125 @@ export function DriverList({
           <p className="text-slate-400 text-sm mt-1">{subtitle}</p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <Button
-            onClick={() => setIsInviteModalOpen(true)}
-            variant="outline"
-            className="bg-white/5 hover:bg-white/15 text-white border-white/15 shadow-sm font-semibold text-xs"
-          >
-            <MailPlus className="w-4 h-4 mr-2 text-blue-400" /> Invite Driver Link
-          </Button>
+        {!readOnly && (
+          <div className="flex items-center gap-3">
+            <Button
+              onClick={() => setIsInviteModalOpen(true)}
+              variant="outline"
+              className="bg-white/5 hover:bg-white/15 text-white border-white/15 shadow-sm font-semibold text-xs"
+            >
+              <MailPlus className="w-4 h-4 mr-2 text-blue-400" /> Invite Driver Link
+            </Button>
 
-          <Button
-            onClick={() => setIsAddModalOpen(true)}
-            className="bg-white/10 hover:bg-white/20 text-white border border-white/15 shadow-sm font-semibold text-xs"
-          >
-            <Plus className="w-4 h-4 mr-2" /> Add Driver
-          </Button>
-        </div>
+            <Button
+              onClick={() => setIsAddModalOpen(true)}
+              className="bg-white/10 hover:bg-white/20 text-white border border-white/15 shadow-sm font-semibold text-xs"
+            >
+              <Plus className="w-4 h-4 mr-2" /> Add Driver
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Filter and View Toggle Toolbar */}
       <div className="p-4 rounded-2xl bg-[#0B1020] border border-white/10 shadow-xl space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="relative w-full sm:w-80">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <Input
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search driver name, license, vehicle..."
-              className="pl-9 h-10 bg-[#0E1528] border-white/10 text-white placeholder:text-slate-400 text-sm rounded-xl"
-            />
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 flex-1 max-w-xl">
+            <div className="relative flex-1">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search driver name, license, vehicle..."
+                className="pl-9 h-10 bg-[#0E1528] border-white/10 text-white placeholder:text-slate-400 text-sm rounded-xl w-full"
+              />
+            </div>
+
+            {/* Modern Filter Popover */}
+            <FilterDropdown
+              isOpen={isFilterOpen}
+              onToggle={() => setIsFilterOpen(!isFilterOpen)}
+              onClose={() => setIsFilterOpen(false)}
+              onClear={handleResetFilters}
+              activeCount={activeFilterCount}
+              title="Filter Driver Roster"
+            >
+              {/* Assignment Filter */}
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  Vehicle Assignment Status
+                </label>
+                <div className="grid grid-cols-3 gap-1.5 text-xs">
+                  {[
+                    { id: "all", label: "All Drivers" },
+                    { id: "assigned", label: "With Truck" },
+                    { id: "unassigned", label: "Standby" },
+                  ].map((a) => (
+                    <button
+                      key={a.id}
+                      type="button"
+                      onClick={() => setAssignmentFilter(a.id)}
+                      className={cn(
+                        "px-2 py-1.5 rounded-xl font-semibold text-center transition-all border text-[11px]",
+                        assignmentFilter === a.id
+                          ? "bg-blue-600/30 border-blue-500 text-white font-bold"
+                          : "bg-white/5 border-white/5 text-slate-400 hover:text-white hover:bg-white/10"
+                      )}
+                    >
+                      {a.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Safety & Performance Rating */}
+              <div className="space-y-1.5 pt-2 border-t border-white/10">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  Driver Safety & Star Rating
+                </label>
+                <div className="grid grid-cols-3 gap-1.5 text-xs">
+                  {[
+                    { id: "all", label: "Any Rating" },
+                    { id: "4.8", label: "★ 4.8+ Top" },
+                    { id: "4.5", label: "★ 4.5+ High" },
+                  ].map((r) => (
+                    <button
+                      key={r.id}
+                      type="button"
+                      onClick={() => setRatingFilter(r.id)}
+                      className={cn(
+                        "px-2 py-1.5 rounded-xl font-semibold text-center transition-all border text-[11px]",
+                        ratingFilter === r.id
+                          ? "bg-blue-600/30 border-blue-500 text-white font-bold"
+                          : "bg-white/5 border-white/5 text-slate-400 hover:text-white hover:bg-white/10"
+                      )}
+                    >
+                      {r.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Sort Order */}
+              <div className="space-y-1.5 pt-2 border-t border-white/10">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  Sort Drivers By
+                </label>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="w-full h-9 bg-[#0E1528] border border-white/10 text-white text-xs rounded-xl px-3 focus:outline-hidden"
+                >
+                  <option value="default">Default Order</option>
+                  <option value="name-asc">Driver Name (A - Z)</option>
+                  <option value="rating-desc">Highest Rating First</option>
+                  <option value="loads-desc">Most Completed Loads</option>
+                </select>
+              </div>
+            </FilterDropdown>
           </div>
 
-          <div className="flex items-center gap-3 self-end sm:self-auto">
+          <div className="flex items-center gap-3 self-end md:self-auto">
             <span className="text-xs font-semibold text-slate-400 hidden sm:inline">
               Showing {filteredDrivers.length} of {drivers.length} Drivers
             </span>
@@ -172,8 +305,8 @@ export function DriverList({
                           />
                         </div>
                       ) : (
-                        <div className="w-12 h-12 rounded-2xl bg-white/10 text-white font-extrabold flex items-center justify-center text-sm border border-white/15 shadow-sm shrink-0">
-                          {driver.name.split(" ").map((n) => n[0]).join("")}
+                        <div className="w-12 h-12 rounded-2xl bg-white/10 text-slate-300 flex items-center justify-center border border-white/15 shadow-sm shrink-0">
+                          <User className="w-6 h-6 text-slate-300" />
                         </div>
                       )}
                       <div>
@@ -210,24 +343,26 @@ export function DriverList({
                       </div>
                     </div>
 
-                    <div className="pt-3 border-t border-white/10 flex items-center justify-between gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setDriverToEdit(driver)}
-                        className="w-[48%] h-8 text-xs font-semibold bg-white/5 border-white/10 text-slate-200 hover:bg-white/10 hover:text-white"
-                      >
-                        <Edit2 className="w-3.5 h-3.5 mr-1" /> Edit
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => deleteDriver(driver.id)}
-                        className="w-[48%] h-8 text-xs font-semibold bg-rose-500/10 border-rose-500/20 text-rose-300 hover:bg-rose-500/20"
-                      >
-                        <Trash2 className="w-3.5 h-3.5 mr-1" /> Remove
-                      </Button>
-                    </div>
+                    {!readOnly && (
+                      <div className="pt-3 border-t border-white/10 flex items-center justify-between gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setDriverToEdit(driver)}
+                          className="w-[48%] h-8 text-xs font-semibold bg-white/5 border-white/10 text-slate-200 hover:bg-white/10 hover:text-white"
+                        >
+                          <Edit2 className="w-3.5 h-3.5 mr-1" /> Edit
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setDriverToDelete(driver)}
+                          className="w-[48%] h-8 text-xs font-semibold bg-rose-500/10 border-rose-500/20 text-rose-300 hover:bg-rose-500/20 cursor-pointer"
+                        >
+                          <Trash2 className="w-3.5 h-3.5 mr-1" /> Remove
+                        </Button>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </motion.div>
@@ -248,7 +383,7 @@ export function DriverList({
                   <th className="px-6 py-4">Duty Status</th>
                   <th className="px-6 py-4">Assigned Vehicle</th>
                   <th className="px-6 py-4">Performance Rating</th>
-                  <th className="px-6 py-4 text-right">Actions</th>
+                  {!readOnly && <th className="px-6 py-4 text-right">Actions</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5 font-medium text-slate-300">
@@ -288,8 +423,8 @@ export function DriverList({
                                 />
                               </div>
                             ) : (
-                              <div className="w-10 h-10 rounded-xl bg-white/10 text-white font-extrabold flex items-center justify-center text-xs border border-white/15 shrink-0">
-                                {driver.name.split(" ").map((n) => n[0]).join("")}
+                              <div className="w-10 h-10 rounded-xl bg-white/10 text-slate-300 flex items-center justify-center border border-white/15 shrink-0">
+                                <User className="w-5 h-5 text-slate-300" />
                               </div>
                             )}
                             <div>
@@ -320,26 +455,28 @@ export function DriverList({
                             <span className="text-slate-400 text-xs">({driver.totalTrips} trips)</span>
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-right">
-                          <div className="flex items-center justify-end gap-1.5">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setDriverToEdit(driver)}
-                              className="h-8 px-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 text-xs font-semibold"
-                            >
-                              <Edit2 className="w-3.5 h-3.5 mr-1" /> Edit
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => deleteDriver(driver.id)}
-                              className="h-8 px-2.5 rounded-lg text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 text-xs font-semibold"
-                            >
-                              <Trash2 className="w-3.5 h-3.5 mr-1" /> Remove
-                            </Button>
-                          </div>
-                        </td>
+                        {!readOnly && (
+                          <td className="px-6 py-4 text-right">
+                            <div className="flex items-center justify-end gap-1.5">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setDriverToEdit(driver)}
+                                className="h-8 w-8 p-0 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg cursor-pointer"
+                              >
+                                <Edit2 className="w-3.5 h-3.5" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setDriverToDelete(driver)}
+                                className="h-8 w-8 p-0 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg cursor-pointer"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </Button>
+                            </div>
+                          </td>
+                        )}
                       </motion.tr>
                     ))
                   )}
@@ -377,6 +514,29 @@ export function DriverList({
         userToEdit={driverToEdit}
         companyId={companyId}
         companyName={companyName}
+      />
+
+      {/* Reusable Delete Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={!!driverToDelete}
+        onClose={() => setDriverToDelete(null)}
+        onConfirm={() => {
+          if (driverToDelete) {
+            deleteDriver(driverToDelete.id);
+            setDriverToDelete(null);
+          }
+        }}
+        title="Remove Commercial Driver"
+        description={`Are you sure you want to remove driver "${driverToDelete?.name}"? Any assigned truck will be unassigned and duty records will be archived.`}
+        confirmText="Remove Driver"
+        cancelText="Cancel"
+        variant="danger"
+        itemDetails={[
+          { label: "Driver Name", value: driverToDelete?.name || "" },
+          { label: "CDL License", value: driverToDelete?.licenseNumber || "" },
+          { label: "Duty Status", value: driverToDelete?.status?.toUpperCase() || "" },
+          { label: "Assigned Truck", value: driverToDelete?.assignedTruckPlate || "Unassigned" },
+        ]}
       />
     </div>
   );

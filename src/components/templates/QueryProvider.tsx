@@ -2,6 +2,7 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactNode, useState } from "react";
+import { InitialAppLoader } from "@/components/molecules/InitialAppLoader";
 
 export function QueryProvider({ children }: { children: ReactNode }) {
   const [queryClient] = useState(
@@ -17,7 +18,7 @@ export function QueryProvider({ children }: { children: ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {children}
+      <InitialAppLoader>{children}</InitialAppLoader>
     </QueryClientProvider>
   );
 }

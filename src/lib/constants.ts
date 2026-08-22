@@ -12,15 +12,34 @@ import {
   Package,
   ShieldCheck,
   Settings,
+  Building2,
 } from "lucide-react";
 import { UserRole, NavItem } from "@/types/roles";
 
-// Carrier Admin Nav Items (Clean sidebar without profile, profile is now in header dropdown)
+// Carrier Admin Nav Items
 export const CARRIER_ADMIN_NAV_ITEMS: NavItem[] = [
   {
     href: "/carrier-admin",
     icon: LayoutDashboard,
     label: "Dashboard",
+  },
+  {
+    href: "/carrier-admin/fleet",
+    icon: Truck,
+    label: "Fleet Management",
+    isDropdown: true,
+    children: [
+      {
+        href: "/carrier-admin/trucks",
+        icon: Truck,
+        label: "Truck Fleet",
+      },
+      {
+        href: "/carrier-admin/users/drivers",
+        icon: UserCheck,
+        label: "Carrier Drivers",
+      },
+    ],
   },
   {
     href: "/carrier-admin/users",
@@ -29,21 +48,21 @@ export const CARRIER_ADMIN_NAV_ITEMS: NavItem[] = [
     isDropdown: true,
     children: [
       {
-        href: "/carrier-admin/users/drivers",
-        icon: UserCheck,
-        label: "Drivers Roster",
+        href: "/carrier-admin/users/admins",
+        icon: ShieldCheck,
+        label: "Admins",
       },
       {
         href: "/carrier-admin/users/dispatchers",
         icon: Headphones,
-        label: "Dispatchers",
+        label: "Dispatch Staff",
       },
     ],
   },
   {
-    href: "/carrier-admin/trucks",
-    icon: Truck,
-    label: "Truck Management",
+    href: "/carrier-admin/organization",
+    icon: Building2,
+    label: "Organization",
   },
   {
     href: "/carrier-admin/membership",
@@ -60,15 +79,33 @@ export const DISPATCH_ADMIN_NAV_ITEMS: NavItem[] = [
     label: "Dashboard",
   },
   {
+    href: "/dispatch-admin/fleet",
+    icon: Truck,
+    label: "Fleet Management",
+    isDropdown: true,
+    children: [
+      {
+        href: "/dispatch-admin/trucks",
+        icon: Truck,
+        label: "Truck Fleet",
+      },
+      {
+        href: "/dispatch-admin/users/drivers",
+        icon: UserCheck,
+        label: "Carrier Drivers",
+      },
+    ],
+  },
+  {
     href: "/dispatch-admin/users",
     icon: Users,
     label: "Users Management",
     isDropdown: true,
     children: [
       {
-        href: "/dispatch-admin/users/drivers",
-        icon: UserCheck,
-        label: "Carrier Drivers",
+        href: "/dispatch-admin/users/admins",
+        icon: ShieldCheck,
+        label: "Admins",
       },
       {
         href: "/dispatch-admin/users/dispatchers",
@@ -78,9 +115,9 @@ export const DISPATCH_ADMIN_NAV_ITEMS: NavItem[] = [
     ],
   },
   {
-    href: "/dispatch-admin/trucks",
-    icon: Truck,
-    label: "Truck Management",
+    href: "/dispatch-admin/organization",
+    icon: Building2,
+    label: "Organization",
   },
   {
     href: "/dispatch-admin/membership",
@@ -114,7 +151,16 @@ export const DISPATCHER_NAV_ITEMS = DISPATCHER_PORTAL_NAV_ITEMS;
 
 export const PORTAL_METADATA: Record<
   UserRole,
-  { title: string; subtitle: string; badge: string; color: string; homePath: string; profilePath: string; membershipPath: string }
+  {
+    title: string;
+    subtitle: string;
+    badge: string;
+    color: string;
+    homePath: string;
+    profilePath: string;
+    organizationPath?: string;
+    membershipPath: string;
+  }
 > = {
   "carrier-admin": {
     title: "Carrier Executive OS",
@@ -123,6 +169,7 @@ export const PORTAL_METADATA: Record<
     color: "bg-blue-600",
     homePath: "/carrier-admin",
     profilePath: "/carrier-admin/profile",
+    organizationPath: "/carrier-admin/organization",
     membershipPath: "/carrier-admin/membership",
   },
   "dispatch-admin": {
@@ -132,6 +179,7 @@ export const PORTAL_METADATA: Record<
     color: "bg-purple-600",
     homePath: "/dispatch-admin",
     profilePath: "/dispatch-admin/profile",
+    organizationPath: "/dispatch-admin/organization",
     membershipPath: "/dispatch-admin/membership",
   },
   dispatcher: {
@@ -150,6 +198,7 @@ export const PORTAL_METADATA: Record<
     color: "bg-blue-600",
     homePath: "/carrier-admin",
     profilePath: "/carrier-admin/profile",
+    organizationPath: "/carrier-admin/organization",
     membershipPath: "/carrier-admin/membership",
   },
 };

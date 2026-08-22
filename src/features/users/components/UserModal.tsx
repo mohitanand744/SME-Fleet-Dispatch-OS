@@ -10,13 +10,15 @@ import {
   Link as LinkIcon,
   Trash2,
   Image as ImageIcon,
+  User,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/atoms/button";
 import { Input } from "@/components/atoms/input";
 import { Label } from "@/components/atoms/label";
 import { Modal } from "@/components/atoms/modal";
-import { DriverUser, DispatcherUser } from "@/data/mock-users";
+import { DriverUser, DispatcherUser, DRIVER_AVATAR_PRESETS, DISPATCHER_AVATAR_PRESETS } from "@/data/mock-users";
+import { SafeImage } from "@/components/atoms/SafeImage";
 import { cn } from "@/lib/utils";
 
 type UserType = "driver" | "dispatcher";
@@ -213,11 +215,13 @@ export function UserModal({
 
                 <div className="flex items-center gap-3">
                   <div className="w-14 h-14 rounded-2xl overflow-hidden border border-white/20 shadow-md bg-[#080D1A] shrink-0 flex items-center justify-center">
-                    {avatarUrl ? (
-                      <img src={avatarUrl} alt="Avatar preview" className="w-full h-full object-cover" />
-                    ) : (
-                      <ImageIcon className="w-6 h-6 text-slate-500" />
-                    )}
+                    <SafeImage
+                      src={avatarUrl}
+                      alt="Avatar preview"
+                      fallbackType={userType === "dispatcher" ? "dispatcher" : "driver"}
+                      enableZoom={false}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
 
                   <div className="flex-1 space-y-2">

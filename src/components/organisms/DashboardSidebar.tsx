@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { LogOut, ChevronDown, ChevronRight, Dot, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import { ConfirmationModal } from "@/components/molecules/ConfirmationModal";
 import {
   CARRIER_ADMIN_NAV_ITEMS,
   DISPATCH_ADMIN_NAV_ITEMS,
@@ -28,6 +29,8 @@ export function DashboardSidebar({
   role = "carrier-admin",
 }: DashboardSidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [isSignOutModalOpen, setIsSignOutModalOpen] = useState(false);
 
   // Resolve active nav items according to role
   const navItems: NavItem[] =
@@ -65,7 +68,7 @@ export function DashboardSidebar({
   };
 
   const sidebarContent = (
-    <div className="relative flex flex-col h-full m-2 md:mx-3 md:mb-3 rounded-3xl bg-[#0B1020] text-slate-100 border border-white/15 shadow-2xl pt-4 w-full md:w-64 shrink-0 overflow-hidden">
+    <div className="relative flex flex-col h-full m-2 md:mx-3 md:mb-3 rounded-t-3xl bg-[#0B1020] text-slate-100 border border-white/15 shadow-2xl pt-4 w-full md:w-64 shrink-0 overflow-hidden">
       {/* Background Image */}
       <div
         className="absolute inset-0 z-0 opacity-[0.15] pointer-events-none bg-cover bg-center"
@@ -240,16 +243,40 @@ export function DashboardSidebar({
 
         {/* Sign out footer */}
         <div className="p-4 border-t border-white/10">
-          <Link
-            href="/login"
-            onClick={handleLinkClick}
-            className="flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-slate-400 hover:bg-white/5 hover:text-rose-400 transition-colors group text-sm font-semibold"
+          <button
+            type="button"
+            onClick={() => {
+              if (isMobile && onClose) onClose();
+              setIsSignOutModalOpen(true);
+            }}
+            className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-rose-400/90 hover:text-rose-300 hover:bg-rose-500/15 transition-all group text-sm font-semibold cursor-pointer border border-transparent hover:border-rose-500/20"
           >
-            <LogOut className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+            <LogOut className="w-4 h-4 group-hover:-translate-x-1 transition-transform text-rose-400" />
             Sign Out
-          </Link>
+          </button>
         </div>
       </div>
+
+      {/* Sign Out Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={isSignOutModalOpen}
+        onClose={() => setIsSignOutModalOpen(false)}
+        onConfirm={() => {
+          setIsSignOutModalOpen(false);
+          router.push("/login");
+        }}
+        title="Sign Out"
+        subtitle="End your active session"
+        description="Are you sure you want to sign out? You will return to the sign in screen."
+        confirmText="Sign Out"
+        cancelText="Stay Signed In"
+        variant="danger"
+        icon={<LogOut className="w-5 h-5 text-rose-400" />}
+        itemDetails={[
+          { label: "Active Workspace", value: roleMeta.title },
+          { label: "Session Status", value: "Active • Ready to close" },
+        ]}
+      />
     </div>
   );
 

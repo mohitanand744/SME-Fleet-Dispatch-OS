@@ -1,19 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import {
-  Award,
   ShieldCheck,
   CheckCircle2,
-  Calendar,
   Building2,
-  Truck,
-  Users,
-  ExternalLink,
   Zap,
-  Clock,
   Sparkles,
 } from "lucide-react";
-import { motion } from "framer-motion";
 import { Button } from "@/components/atoms/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/atoms/card";
 import {
@@ -23,7 +17,7 @@ import {
   DISPATCHER_MEMBERSHIP,
 } from "@/data/mock-memberships";
 import { UserRole } from "@/types/roles";
-import { cn } from "@/lib/utils";
+import { UpgradeTierModal } from "./UpgradeTierModal";
 
 interface MembershipOverviewProps {
   role?: UserRole;
@@ -36,6 +30,8 @@ export function MembershipOverview({
   title = "Company Membership & Network",
   subtitle = "Active enterprise license, network associations, truck quotas, and contract agreements.",
 }: MembershipOverviewProps) {
+  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
+
   const membership: CompanyMembership =
     role === "dispatcher"
       ? DISPATCHER_MEMBERSHIP
@@ -43,15 +39,8 @@ export function MembershipOverview({
       ? DISPATCH_ADMIN_MEMBERSHIP
       : CARRIER_ADMIN_MEMBERSHIP;
 
-  const truckQuotaPercent = Math.round(
-    (membership.trucksQuota.used / membership.trucksQuota.total) * 100
-  );
-  const dispatcherQuotaPercent = Math.round(
-    (membership.dispatchersQuota.used / membership.dispatchersQuota.total) * 100
-  );
-
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -66,112 +55,13 @@ export function MembershipOverview({
         </div>
 
         <div className="flex items-center gap-3">
-          <Button className="bg-white/10 hover:bg-white/20 text-white border border-white/15 shadow-sm font-semibold text-xs">
+          <Button
+            onClick={() => setIsUpgradeModalOpen(true)}
+            className="bg-white/10 hover:bg-white/20 text-white border border-white/15 shadow-sm font-semibold text-xs cursor-pointer"
+          >
             <Sparkles className="w-4 h-4 mr-2 text-amber-400" /> Upgrade Capacity Tier
           </Button>
         </div>
-      </div>
-
-      {/* Hero Membership Banner Card */}
-      <Card className="border border-white/10 shadow-2xl bg-[#0B1020] text-white rounded-3xl overflow-hidden relative">
-        <div className="p-6 md:p-8 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10">
-          <div className="flex items-start gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-white/10 text-white flex items-center justify-center border border-white/15 shadow-lg shrink-0">
-              <Award className="w-8 h-8 text-amber-400" />
-            </div>
-            <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-blue-400 font-mono">
-                {membership.id} • {membership.planTier}
-              </span>
-              <h2 className="text-2xl font-extrabold text-white mt-0.5">{membership.companyName}</h2>
-              <p className="text-sm text-slate-400 mt-1 flex flex-wrap items-center gap-3">
-                <span className="font-mono">{membership.dotNumber}</span>
-                <span>•</span>
-                <span className="font-mono">{membership.mcNumber}</span>
-                <span>•</span>
-                <span className="text-slate-300">{membership.billingCycle}</span>
-              </p>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="px-4 py-2.5 rounded-2xl bg-[#0E1528] border border-white/10 text-center">
-              <p className="text-[11px] uppercase font-bold text-slate-400">SLA Level</p>
-              <p className="text-xs font-extrabold text-white mt-0.5">{membership.supportLevel}</p>
-            </div>
-            <div className="px-4 py-2.5 rounded-2xl bg-[#0E1528] border border-white/10 text-center">
-              <p className="text-[11px] uppercase font-bold text-slate-400">Status</p>
-              <p className="text-xs font-extrabold text-emerald-400 mt-0.5 uppercase tracking-wider">
-                {membership.status}
-              </p>
-            </div>
-          </div>
-        </div>
-      </Card>
-
-      {/* Quotas & Capacity Meters */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card className="border border-white/10 shadow-xl bg-[#0B1020] text-white rounded-2xl p-5 space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-white/10 text-white flex items-center justify-center border border-white/15">
-                <Truck className="w-4 h-4" />
-              </div>
-              <div>
-                <h4 className="text-sm font-bold text-white">Truck Fleet Allocation Quota</h4>
-                <p className="text-xs text-slate-400">Authorized live commercial vehicles</p>
-              </div>
-            </div>
-            <span className="text-sm font-extrabold text-white font-mono">
-              {membership.trucksQuota.used} / {membership.trucksQuota.total}
-            </span>
-          </div>
-
-          <div className="w-full bg-[#0E1528] rounded-full h-2.5 overflow-hidden border border-white/10">
-            <div
-              className={cn(
-                "h-full rounded-full transition-all",
-                truckQuotaPercent > 85 ? "bg-amber-400" : "bg-blue-400"
-              )}
-              style={{ width: `${truckQuotaPercent}%` }}
-            />
-          </div>
-          <p className="text-[11px] text-slate-400 flex justify-between font-medium">
-            <span>{truckQuotaPercent}% Allocated</span>
-            <span>{membership.trucksQuota.total - membership.trucksQuota.used} Slots Available</span>
-          </p>
-        </Card>
-
-        <Card className="border border-white/10 shadow-xl bg-[#0B1020] text-white rounded-2xl p-5 space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-white/10 text-white flex items-center justify-center border border-white/15">
-                <Users className="w-4 h-4" />
-              </div>
-              <div>
-                <h4 className="text-sm font-bold text-white">Dispatcher Desk Seat Allocation</h4>
-                <p className="text-xs text-slate-400">Simultaneous active console seats</p>
-              </div>
-            </div>
-            <span className="text-sm font-extrabold text-white font-mono">
-              {membership.dispatchersQuota.used} / {membership.dispatchersQuota.total}
-            </span>
-          </div>
-
-          <div className="w-full bg-[#0E1528] rounded-full h-2.5 overflow-hidden border border-white/10">
-            <div
-              className={cn(
-                "h-full rounded-full transition-all",
-                dispatcherQuotaPercent > 85 ? "bg-amber-400" : "bg-purple-400"
-              )}
-              style={{ width: `${dispatcherQuotaPercent}%` }}
-            />
-          </div>
-          <p className="text-[11px] text-slate-400 flex justify-between font-medium">
-            <span>{dispatcherQuotaPercent}% Allocated</span>
-            <span>{membership.dispatchersQuota.total - membership.dispatchersQuota.used} Seats Available</span>
-          </p>
-        </Card>
       </div>
 
       {/* Associated Companies & Carrier Networks */}
@@ -237,6 +127,13 @@ export function MembershipOverview({
           ))}
         </div>
       </Card>
+
+      {/* Upgrade Tier Modal */}
+      <UpgradeTierModal
+        isOpen={isUpgradeModalOpen}
+        onClose={() => setIsUpgradeModalOpen(false)}
+        currentTierName={membership.planName}
+      />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { TruckItem, INITIAL_TRUCKS } from "./mock-trucks";
-import { DriverUser, DispatcherUser, INITIAL_DRIVERS, INITIAL_DISPATCHERS } from "./mock-users";
+import { DriverUser, DispatcherUser, AdminUser, INITIAL_DRIVERS, INITIAL_DISPATCHERS, INITIAL_ADMINS } from "./mock-users";
 import {
   CompanyMembership,
   CARRIER_ADMIN_MEMBERSHIP,
@@ -8,6 +8,10 @@ import {
   DISPATCHER_MEMBERSHIP,
 } from "./mock-memberships";
 import { UserProfile, MOCK_PROFILES } from "./mock-profiles";
+import {
+  CompanyOrganization,
+  MOCK_ORGANIZATIONS,
+} from "./mock-organizations";
 import {
   CARRIER_ADMIN_METRICS,
   DISPATCH_ADMIN_METRICS,
@@ -18,13 +22,16 @@ export * from "./mock-trucks";
 export * from "./mock-users";
 export * from "./mock-memberships";
 export * from "./mock-profiles";
+export * from "./mock-organizations";
 export * from "./mock-metrics";
 
 // In-Memory Global State for demo interaction without external backend
 let globalTrucks: TruckItem[] = [...INITIAL_TRUCKS];
 let globalDrivers: DriverUser[] = [...INITIAL_DRIVERS];
 let globalDispatchers: DispatcherUser[] = [...INITIAL_DISPATCHERS];
+let globalAdmins: AdminUser[] = [...INITIAL_ADMINS];
 let globalProfiles: Record<string, UserProfile> = { ...MOCK_PROFILES };
+let globalOrganizations: Record<string, CompanyOrganization> = { ...MOCK_ORGANIZATIONS };
 
 const listeners = new Set<() => void>();
 
@@ -148,6 +155,46 @@ export function useDispatchersData(companyId?: string) {
   return { dispatchers, addDispatcher, updateDispatcher, deleteDispatcher };
 }
 
+export function useAdminsData(companyId?: string) {
+  const [admins, setAdmins] = useState<AdminUser[]>(() => {
+    return companyId ? globalAdmins.filter((a) => a.companyId === companyId) : globalAdmins;
+  });
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      setAdmins(companyId ? globalAdmins.filter((a) => a.companyId === companyId) : [...globalAdmins]);
+    };
+    listeners.add(handleUpdate);
+    return () => {
+      listeners.delete(handleUpdate);
+    };
+  }, [companyId]);
+
+  const addAdmin = (admin: Omit<AdminUser, "id" | "joinedDate" | "lastActive"> & { lastActive?: string }) => {
+    const newAdmin: AdminUser = {
+      ...admin,
+      id: `USR-ADM-${Math.floor(10 + Math.random() * 90)}`,
+      joinedDate: new Date().toISOString().split("T")[0],
+      lastActive: admin.lastActive || "Just now",
+    };
+    globalAdmins = [newAdmin, ...globalAdmins];
+    notify();
+    return newAdmin;
+  };
+
+  const updateAdmin = (id: string, updates: Partial<AdminUser>) => {
+    globalAdmins = globalAdmins.map((a) => (a.id === id ? { ...a, ...updates } : a));
+    notify();
+  };
+
+  const deleteAdmin = (id: string) => {
+    globalAdmins = globalAdmins.filter((a) => a.id !== id);
+    notify();
+  };
+
+  return { admins, addAdmin, updateAdmin, deleteAdmin };
+}
+
 export function useUserProfile(roleKey: string) {
   const [profile, setProfile] = useState<UserProfile>(
     () => globalProfiles[roleKey] || MOCK_PROFILES["carrier-admin"]
@@ -173,4 +220,46 @@ export function useUserProfile(roleKey: string) {
   };
 
   return { profile, updateProfile };
+}
+
+export function useOrganizationData(roleOrCompanyKey: string = "carrier-admin") {
+  // Normalize key: default to carrier-admin if admin
+  const normalizedKey =
+    roleOrCompanyKey === "dispatch-admin" || roleOrCompanyKey === "CMP-DISPATCH-01"
+      ? "dispatch-admin"
+      : "carrier-admin";
+
+  const [organization, setOrganization] = useState<CompanyOrganization>(
+    () => globalOrganizations[normalizedKey] || MOCK_ORGANIZATIONS["carrier-admin"]
+  );
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      if (globalOrganizations[normalizedKey]) {
+        setOrganization({ ...globalOrganizations[normalizedKey] });
+      }
+    };
+    listeners.add(handleUpdate);
+    return () => {
+      listeners.delete(handleUpdate);
+    };
+  }, [normalizedKey]);
+
+  const updateOrganization = (updates: Partial<CompanyOrganization>) => {
+    if (globalOrganizations[normalizedKey]) {
+      globalOrganizations[normalizedKey] = {
+        ...globalOrganizations[normalizedKey],
+        ...updates,
+      };
+
+      // Also sync companyName to profile
+      if (updates.companyName && globalProfiles[normalizedKey]) {
+        globalProfiles[normalizedKey].companyName = updates.companyName;
+      }
+
+      notify();
+    }
+  };
+
+  return { organization, updateOrganization };
 }

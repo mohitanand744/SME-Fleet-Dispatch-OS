@@ -21,10 +21,10 @@ import { cn } from "@/lib/utils";
 interface InviteUserModalProps {
   isOpen: boolean;
   onClose: () => void;
-  userType: "driver" | "dispatcher";
+  userType?: "driver" | "dispatcher" | "admin";
   companyName?: string;
   companyId?: string;
-  onInviteSent?: (data: { email: string; name: string; type: "driver" | "dispatcher" }) => void;
+  onInviteSent?: (data: { email: string; name: string; type: "driver" | "dispatcher" | "admin" }) => void;
 }
 
 export function InviteUserModal({
@@ -42,6 +42,7 @@ export function InviteUserModal({
   const [isSentSuccess, setIsSentSuccess] = useState(false);
 
   const isDriver = userType === "driver";
+  const isAdmin = userType === "admin";
 
   // Generate a mock unique invitation token link
   const inviteToken = `inv_${Math.random().toString(36).substring(2, 9)}`;
@@ -84,16 +85,18 @@ export function InviteUserModal({
                 <div
                   className={cn(
                     "w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center border shadow-sm shrink-0",
-                    isDriver
+                    isAdmin
+                      ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
+                      : isDriver
                       ? "bg-blue-500/20 text-blue-400 border-blue-500/30"
                       : "bg-purple-500/20 text-purple-400 border-purple-500/30"
                   )}
                 >
-                  {isDriver ? <UserCheck className="w-4 h-4 sm:w-5 sm:h-5" /> : <Headphones className="w-4 h-4 sm:w-5 sm:h-5" />}
+                  {isAdmin ? <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" /> : isDriver ? <UserCheck className="w-4 h-4 sm:w-5 sm:h-5" /> : <Headphones className="w-4 h-4 sm:w-5 sm:h-5" />}
                 </div>
                 <div className="min-w-0">
                   <h3 className="text-base sm:text-lg font-extrabold text-white truncate">
-                    {isDriver ? "Invite Commercial Driver" : "Invite Fleet Dispatcher"}
+                    {isAdmin ? "Invite Administrator" : isDriver ? "Invite Commercial Driver" : "Invite Fleet Dispatcher"}
                   </h3>
                   <p className="text-[11px] sm:text-xs text-slate-400 truncate">
                     Send single-use onboarding link to email
